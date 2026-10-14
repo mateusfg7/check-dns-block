@@ -1,24 +1,45 @@
 /**
  * Shared data contract between the Rust backend and the React frontend.
- *
- * NOTE: this is scaffolding only — no DNS resolution happens yet. These
- * types mirror the Rust side (`src-tauri/src/dns.rs`) so the UI can be
- * built against a stable shape before the real logic lands.
+ * Mirrors `src-tauri/src/dns.rs` and the events emitted by the `check` command.
  */
 
-/** Outcome of comparing a domain/IP lookup against two DNS servers. */
-export type Verdict = "blocked" | "not_blocked" | "not_found" | "reverse_ok";
+/** Kind of a parsed entry: a domain name or a literal IP address. */
+export type EntryKind = "domain" | "ip";
 
-/** Result row for a single domain or IP the user pasted in. */
-export interface CheckResult {
-  /** The domain or IP exactly as entered by the user. */
-  query: string;
+/** Outcome of checking a single domain/IP against the target (and reference) DNS. */
+export type Verdict =
+  | "blocked"
+  | "not_blocked"
+  | "unresolved"
+  | "no_response"
+  | "not_found"
+  | "reverse_ok"
+  | "no_reverse";
+
+/** Result row for a single domain or IP, as streamed by the `check` command. */
+export interface CheckRow {
+  /** Position in the original (deduped) input; rows can arrive out of order. */
+  index: number;
+  entry: string;
+  kind: EntryKind;
   verdict: Verdict;
-  /** What the ISP DNS resolved the query to, if anything. */
-  ispAnswer: string | null;
-  /** What the public DNS resolved the query to, if anything. */
-  publicAnswer: string | null;
+  targetAnswer: string;
+  referenceAnswer: string | null;
+  /** Local timestamp formatted as `dd/MM/yyyy HH:mm:ss`. */
+  checkedAt: string;
 }
+
+/** Events streamed over the `check` command's channel. */
+export type CheckEvent =
+  | {
+      type: "started";
+      total: number;
+      ignored: number;
+      reference: string | null;
+      warning: string | null;
+    }
+  | ({ type: "row" } & CheckRow)
+  | { type: "finished" };
 
 /** Static info shown in the app header, returned by the `app_info` command. */
 export interface AppInfo {

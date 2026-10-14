@@ -1,83 +1,66 @@
-import { Badge, Button, Empty, Surface, Switch, Table, Text } from "@cloudflare/kumo";
-import { FloppyDisk, ListMagnifyingGlass } from "@phosphor-icons/react";
-import { useState } from "react";
-import type { CheckResult, Verdict } from "../lib/types";
+import { Badge, Empty, Table } from "@cloudflare/kumo";
+import { ListMagnifyingGlass } from "@phosphor-icons/react";
+import { TIPO_LABEL, VERDICT_LABEL } from "../lib/report";
+import type { CheckRow, Verdict } from "../lib/types";
+import type { CheckStatus } from "../lib/useCheck";
 
-const VERDICT_LABEL: Record<Verdict, string> = {
-  blocked: "BLOQUEADO",
-  not_blocked: "NÃO BLOQUEADO",
-  not_found: "NÃO EXISTE",
-  reverse_ok: "REVERSO OK",
-};
-
-const VERDICT_BADGE: Record<Verdict, "error" | "success" | "neutral" | "info"> = {
+const VERDICT_BADGE: Record<Verdict, "error" | "success" | "warning" | "neutral"> = {
   blocked: "error",
   not_blocked: "success",
+  reverse_ok: "success",
+  unresolved: "warning",
+  no_response: "warning",
   not_found: "neutral",
-  reverse_ok: "info",
+  no_reverse: "neutral",
 };
 
-// Placeholder data for this scaffold — real results come from the Rust backend later.
-const results: CheckResult[] = [];
+interface ResultsPanelProps {
+  /** Already filtered (e.g. by "só bloqueados") — rendered as-is. */
+  rows: CheckRow[];
+  server: string;
+  reference: string | null;
+  status: CheckStatus;
+}
 
-export function ResultsPanel() {
-  const [onlyBlocked, setOnlyBlocked] = useState(false);
-  const visibleResults = onlyBlocked
-    ? results.filter((result) => result.verdict === "blocked")
-    : results;
+export function ResultsPanel({ rows, server, reference, status }: ResultsPanelProps) {
+  if (rows.length === 0) {
+    return (
+      <Empty
+        icon={<ListMagnifyingGlass size={40} />}
+        title={status === "running" ? "Consultando…" : "Nenhum resultado ainda"}
+        description="Cole domínios ou IPs acima e clique em Verificar para ver o resultado aqui."
+      />
+    );
+  }
 
   return (
-    <Surface className="flex h-full flex-col gap-4 p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Text variant="heading">Resultado</Text>
-        <div className="flex items-center gap-4">
-          <Switch
-            label="Mostrar só bloqueados"
-            checked={onlyBlocked}
-            onCheckedChange={setOnlyBlocked}
-            size="sm"
-          />
-          {/* TODO: wire up to a `save_evidence` command once it exists. */}
-          <Button variant="secondary" icon={<FloppyDisk size={16} />} disabled title="Em breve">
-            Salvar evidência…
-          </Button>
-        </div>
-      </div>
-
-      {visibleResults.length === 0 ? (
-        <Empty
-          icon={<ListMagnifyingGlass size={40} />}
-          title="Nenhum resultado ainda"
-          description="Cole domínios ou IPs ao lado e clique em Verificar para ver o resultado aqui."
-        />
-      ) : (
-        <div className="overflow-auto">
-          <Table>
-            <Table.Header>
-              <Table.Row>
-                <Table.Head>Domínio/IP</Table.Head>
-                <Table.Head>Resultado</Table.Head>
-                <Table.Head>DNS operadora</Table.Head>
-                <Table.Head>DNS público</Table.Head>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {visibleResults.map((result) => (
-                <Table.Row key={result.query}>
-                  <Table.Cell className="font-mono text-sm">{result.query}</Table.Cell>
-                  <Table.Cell>
-                    <Badge variant={VERDICT_BADGE[result.verdict]}>
-                      {VERDICT_LABEL[result.verdict]}
-                    </Badge>
-                  </Table.Cell>
-                  <Table.Cell>{result.ispAnswer ?? "—"}</Table.Cell>
-                  <Table.Cell>{result.publicAnswer ?? "—"}</Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-        </div>
-      )}
-    </Surface>
+    <div className="min-h-0 flex-1 overflow-auto">
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>Entrada</Table.Head>
+            <Table.Head>Tipo</Table.Head>
+            <Table.Head>Situação</Table.Head>
+            <Table.Head>Resposta {server}</Table.Head>
+            {reference ? <Table.Head>Resposta {reference}</Table.Head> : null}
+            <Table.Head>Consultado em</Table.Head>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {rows.map((row) => (
+            <Table.Row key={row.index}>
+              <Table.Cell className="font-mono text-sm">{row.entry}</Table.Cell>
+              <Table.Cell>{TIPO_LABEL[row.kind]}</Table.Cell>
+              <Table.Cell>
+                <Badge variant={VERDICT_BADGE[row.verdict]}>{VERDICT_LABEL[row.verdict]}</Badge>
+              </Table.Cell>
+              <Table.Cell>{row.targetAnswer}</Table.Cell>
+              {reference ? <Table.Cell>{row.referenceAnswer ?? "—"}</Table.Cell> : null}
+              <Table.Cell>{row.checkedAt}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   );
 }

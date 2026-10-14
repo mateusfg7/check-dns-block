@@ -17,7 +17,7 @@ export function AppHeader({ appInfo }: AppHeaderProps) {
         <ShieldCheck size={24} weight="duotone" aria-hidden />
         <div>
           <Text variant="heading" as="h1" size="lg">
-            Verifica Bloqueio DNS
+            Check DNS Block
           </Text>
           <Text variant="secondary" size="sm" as="p">
             Confira de uma vez se vários domínios estão bloqueados
@@ -26,8 +26,6 @@ export function AppHeader({ appInfo }: AppHeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Badge variant="neutral">DNS: {appInfo?.ispDns ?? "—"}</Badge>
-        <Badge variant="outline">Público: {appInfo?.publicDns ?? "—"}</Badge>
         {appInfo ? <Badge variant="teal-subtle">v{appInfo.version}</Badge> : null}
         <ThemeToggle />
       </div>
