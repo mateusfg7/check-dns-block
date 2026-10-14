@@ -42,6 +42,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # `scripts/sync-version.mjs` (run below via `pnpm run version`) refreshes
+      # Cargo.lock with `cargo update --workspace --offline`. This job never
+      # otherwise builds the Rust crate, so the local registry cache may be
+      # missing newly-added dependencies; fetch them now so that offline
+      # update can resolve.
+      - run: cargo fetch --manifest-path src-tauri/Cargo.toml
+
       # On every push to main: if there are pending changesets, opens/updates a
       # "Version Packages" PR. Once that PR is merged (so no changesets remain),
       # this step instead tags the release and sets `published=true`.
