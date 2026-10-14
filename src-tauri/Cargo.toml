@@ -1,7 +1,7 @@
 [package]
 name = "ip-block-checker"
 version = "0.1.0"
-description = "Verifica Bloqueio DNS - checks whether domains/IPs are blocked on a given DNS server"
+description = "Check DNS Block - checks whether domains/IPs are blocked on a given DNS server"
 authors = ["Mateus Felipe Gonçalves"]
 edition = "2024"
 

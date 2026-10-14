@@ -10,7 +10,7 @@ import { toCsv, toEvidence, toTsv } from "./lib/report";
 import type { AppInfo } from "./lib/types";
 import { useCheck } from "./lib/useCheck";
 
-const STORAGE_KEY = "verifica-bloqueio-dns:settings";
+const STORAGE_KEY = "check-dns-block:settings";
 
 interface StoredSettings {
   server: string;

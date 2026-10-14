@@ -17,7 +17,7 @@ export function AppHeader({ appInfo }: AppHeaderProps) {
         <ShieldCheck size={24} weight="duotone" aria-hidden />
         <div>
           <Text variant="heading" as="h1" size="lg">
-            Verifica Bloqueio DNS
+            Check DNS Block
           </Text>
           <Text variant="secondary" size="sm" as="p">
             Confira de uma vez se vários domínios estão bloqueados

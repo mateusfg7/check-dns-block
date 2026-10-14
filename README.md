@@ -1,25 +1,24 @@
 <!-- TODO: replace `mateusfg7/ip-block-checker` below with the real GitHub slug once this repo has a remote. -->
 
-# Verifica Bloqueio DNS
+# Check DNS Block
 
 [![CI](https://github.com/mateusfg7/ip-block-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusfg7/ip-block-checker/actions/workflows/ci.yml)
 [![Release](https://github.com/mateusfg7/ip-block-checker/actions/workflows/release.yml/badge.svg)](https://github.com/mateusfg7/ip-block-checker/actions/workflows/release.yml)
 
-Cross-platform rewrite of the original `Verifica-Bloqueio-DNS.cmd` (Windows-only) tool, which
-checks whether a list of domains/IPs is blocked on a given DNS server by comparing its answers
-against a public DNS server.
+Cross-platform desktop app that checks whether a list of domains/IPs is blocked on a given
+DNS server by comparing its answers against a public DNS server.
 
 Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.com/cloudflare/kumo).
 
 <!-- TODO: swap in a real screenshot once `pnpm tauri dev` has been visually checked. -->
-<!-- ![Verifica Bloqueio DNS screenshot](./docs/screenshot.png) -->
+<!-- ![Check DNS Block screenshot](./docs/screenshot.png) -->
 
 ## Status
 
-The window workflow from the original `.cmd` tool is implemented: paste domains/IPs, resolve
-them against a configurable target DNS and reference DNS, and export the results.
+Paste domains/IPs, resolve them against a configurable target DNS and reference DNS, and
+export the results.
 
-| Feature (from the original `.cmd` tool) | Status |
+| Feature | Status |
 | --- | --- |
 | App shell: header, input/results panes, status bar | ✅ done |
 | CI: lint, typecheck, tests, debug build | ✅ done |

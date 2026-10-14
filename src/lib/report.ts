@@ -1,7 +1,6 @@
 /**
  * Pure formatting helpers for the result table, CSV export, clipboard copy
- * and the evidence report. Ported 1:1 from `Resumo`, `Para-Csv`, `Para-Evidencia`
- * and `Texto-Resposta`'s situation labels in the original `.cmd` tool.
+ * and the evidence report.
  */
 import type { CheckRow, EntryKind, Verdict } from "./types";
 

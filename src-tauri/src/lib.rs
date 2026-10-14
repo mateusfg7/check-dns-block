@@ -56,8 +56,8 @@ fn parse_server(raw: &str, error: &str) -> Result<IpAddr, String> {
     raw.trim().parse().map_err(|_| error.to_string())
 }
 
-/// Runs a preflight query for [`CONTROL_DOMAIN`] against `resolver`, mirroring
-/// the original tool's "is this server even reachable from here" check.
+/// Runs a preflight query for [`CONTROL_DOMAIN`] against `resolver`, to check
+/// whether the server is even reachable from here.
 async fn is_server_reachable(resolver: &hickory_resolver::TokioResolver) -> bool {
     let control = Entry {
         name: CONTROL_DOMAIN.to_string(),
@@ -68,7 +68,6 @@ async fn is_server_reachable(resolver: &hickory_resolver::TokioResolver) -> bool
 
 /// Parses, preflights and resolves every entry in `input` against `server`
 /// (and, optionally, `reference`), streaming progress over `on_event`.
-/// Mirrors the window workflow in the original `.cmd` tool.
 #[tauri::command]
 async fn check(
     input: String,

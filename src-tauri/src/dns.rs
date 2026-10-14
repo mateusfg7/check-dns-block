@@ -1,8 +1,4 @@
 //! Parsing, resolution and classification of domains/IPs against a DNS server.
-//!
-//! This module ports the behaviour of the original `Verifica-Bloqueio-DNS.cmd`
-//! PowerShell tool: `parse_entries` mirrors `Ler-Entradas`, `classify` mirrors
-//! `Classificar`, and `answer_text` mirrors `Texto-Resposta`.
 
 use std::collections::HashSet;
 use std::net::IpAddr;
@@ -59,9 +55,8 @@ static DOMAIN_RE: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 /// Parses pasted text into deduped domain/IP entries, counting tokens that
-/// are neither. Mirrors `Ler-Entradas` from the original `.cmd` tool: accepts
-/// URLs, e-mails, host:port, wildcards, IPv4/IPv6, one per line or separated
-/// by whitespace/commas/semicolons/etc.
+/// are neither. Accepts URLs, e-mails, host:port, wildcards, IPv4/IPv6, one
+/// per line or separated by whitespace/commas/semicolons/etc.
 pub fn parse_entries(text: &str) -> ParsedInput {
     let mut seen = HashSet::new();
     let mut entries = Vec::new();
@@ -127,8 +122,7 @@ pub enum Answer {
     Error(String),
 }
 
-/// Classification of a checked entry, mirroring `Classificar` in the original
-/// `.cmd` tool's four/seven-way outcome.
+/// Classification of a checked entry.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Verdict {
@@ -155,7 +149,7 @@ fn is_sinkhole(ip: &str) -> bool {
 }
 
 /// Classifies a checked entry from the target server's answer and, for
-/// domains, the reference server's answer. Mirrors `Classificar`.
+/// domains, the reference server's answer.
 pub fn classify(kind: EntryKind, target: &Answer, reference: Option<&Answer>) -> Verdict {
     if *target == Answer::Timeout {
         return Verdict::NoResponse;
@@ -186,7 +180,6 @@ pub fn classify(kind: EntryKind, target: &Answer, reference: Option<&Answer>) ->
 }
 
 /// Renders an answer as the short Portuguese text shown in the UI/reports.
-/// Mirrors `Texto-Resposta`.
 pub fn answer_text(answer: &Answer, kind: EntryKind) -> String {
     match answer {
         Answer::Ok(values) => values.join(", "),

@@ -34,7 +34,7 @@ describe("App", () => {
   it("renders the header, DNS settings and the input area", async () => {
     render(<App />);
 
-    expect(screen.getByText("Verifica Bloqueio DNS")).toBeInTheDocument();
+    expect(screen.getByText("Check DNS Block")).toBeInTheDocument();
     expect(screen.getByText("Servidor DNS a consultar:")).toBeInTheDocument();
     expect(await screen.findByLabelText("Domínios e IPs para verificar")).toBeInTheDocument();
   });

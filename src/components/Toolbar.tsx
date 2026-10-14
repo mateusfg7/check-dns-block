@@ -14,8 +14,8 @@ interface ToolbarProps {
   onOnlyBlockedChange: (value: boolean) => void;
 }
 
-/** The action row from the original tool's window: Verificar/Limpar on the
- * left, the export actions, then the "só bloqueados" filter. */
+/** The action row: Verificar/Limpar on the left, the export actions, then
+ * the "só bloqueados" filter. */
 export function Toolbar({
   running,
   canVerify,

@@ -37,7 +37,7 @@ export async function check(
   onEvent: (event: CheckEvent) => void,
 ): Promise<void> {
   if (!isTauri()) {
-    throw new Error("A verificação só funciona dentro do aplicativo Verifica Bloqueio DNS.");
+    throw new Error("A verificação só funciona dentro do aplicativo Check DNS Block.");
   }
   const channel = new Channel<CheckEvent>();
   channel.onmessage = onEvent;
@@ -57,7 +57,7 @@ export async function saveTextFile(options: {
   bom?: boolean;
 }): Promise<string | null> {
   if (!isTauri()) {
-    throw new Error("Salvar arquivos só funciona dentro do aplicativo Verifica Bloqueio DNS.");
+    throw new Error("Salvar arquivos só funciona dentro do aplicativo Check DNS Block.");
   }
   return invoke<string | null>("save_text_file", {
     defaultName: options.defaultName,
