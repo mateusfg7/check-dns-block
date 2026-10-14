@@ -1,48 +1,77 @@
-import { Button, InputArea, Surface, Text } from "@cloudflare/kumo";
-import { Broom, MagnifyingGlass } from "@phosphor-icons/react";
-import { useState } from "react";
+import { Input, InputArea, Switch, Text } from "@cloudflare/kumo";
 
 const PLACEHOLDER = `exemplo.com.br
 192.0.2.10
 outro-dominio.com`;
 
-export function InputPanel() {
-  const [value, setValue] = useState("");
+interface InputPanelProps {
+  server: string;
+  onServerChange: (value: string) => void;
+  compareEnabled: boolean;
+  onCompareEnabledChange: (value: boolean) => void;
+  reference: string;
+  onReferenceChange: (value: string) => void;
+  value: string;
+  onValueChange: (value: string) => void;
+  running: boolean;
+}
 
+export function InputPanel({
+  server,
+  onServerChange,
+  compareEnabled,
+  onCompareEnabledChange,
+  reference,
+  onReferenceChange,
+  value,
+  onValueChange,
+  running,
+}: InputPanelProps) {
   return (
-    <Surface className="flex h-full flex-col gap-4 p-6">
-      <div>
-        <Text variant="heading" as="h2">
-          Domínios e IPs
-        </Text>
-        <Text variant="secondary" size="sm" as="p">
-          Cole um por linha. A verificação ainda não está implementada nesta etapa.
-        </Text>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <div className="flex items-center gap-2">
+          <Text variant="body" size="sm">
+            Servidor DNS a consultar:
+          </Text>
+          <Input
+            aria-label="Servidor DNS a consultar"
+            value={server}
+            onChange={(e) => onServerChange(e.target.value)}
+            disabled={running}
+            className="w-36"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            label="Comparar com DNS público:"
+            checked={compareEnabled}
+            onCheckedChange={onCompareEnabledChange}
+            disabled={running}
+          />
+          <Input
+            aria-label="DNS público de comparação"
+            value={reference}
+            onChange={(e) => onReferenceChange(e.target.value)}
+            disabled={running || !compareEnabled}
+            className="w-36"
+          />
+        </div>
       </div>
+
+      <Text variant="secondary" size="sm" as="p">
+        Cole abaixo os domínios e/ou IPs (um por linha, ou separados por espaço, vírgula ou ponto e
+        vírgula):
+      </Text>
 
       <InputArea
         value={value}
-        onValueChange={setValue}
+        onValueChange={onValueChange}
         placeholder={PLACEHOLDER}
-        minRows={10}
-        className="flex-1"
+        rows={5}
+        disabled={running}
         aria-label="Domínios e IPs para verificar"
       />
-
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="secondary"
-          icon={<Broom size={16} />}
-          onClick={() => setValue("")}
-          disabled={value.length === 0}
-        >
-          Limpar
-        </Button>
-        {/* TODO: wire up to the Rust `check_domains` command once DNS resolution is implemented. */}
-        <Button variant="primary" icon={<MagnifyingGlass size={16} />} disabled title="Em breve">
-          Verificar
-        </Button>
-      </div>
-    </Surface>
+    </div>
   );
 }

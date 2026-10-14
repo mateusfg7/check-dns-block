@@ -26,8 +26,6 @@ export function AppHeader({ appInfo }: AppHeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Badge variant="neutral">DNS: {appInfo?.ispDns ?? "—"}</Badge>
-        <Badge variant="outline">Público: {appInfo?.publicDns ?? "—"}</Badge>
         {appInfo ? <Badge variant="teal-subtle">v{appInfo.version}</Badge> : null}
         <ThemeToggle />
       </div>
