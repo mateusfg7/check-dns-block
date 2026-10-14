@@ -1,3 +1,5 @@
+<div align="center">
+
 # Check DNS Block
 
 [![CI](https://github.com/mateusfg7/check-dns-block/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusfg7/check-dns-block/actions/workflows/ci.yml)
@@ -8,7 +10,9 @@ DNS server, by comparing its answers against a reference DNS server.
 
 Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.com/cloudflare/kumo).
 
-![Check DNS Block screenshot placeholder](https://placehold.co/960x600?text=Screenshot+coming+soon)
+![Check DNS Block screenshot placeholder](./docs/screenshot.png)
+
+</div>
 
 ## Features
 
