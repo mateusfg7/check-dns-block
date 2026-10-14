@@ -7,7 +7,7 @@
 
 Cross-platform rewrite of the original `Verifica-Bloqueio-DNS.cmd` (Windows-only) tool, which
 checks whether a list of domains/IPs is blocked on a given DNS server by comparing its answers
-against a public DNS server (see [`LEIA-ME.txt`](./LEIA-ME.txt) for the original tool's behavior).
+against a public DNS server.
 
 Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.com/cloudflare/kumo).
 
@@ -16,20 +16,23 @@ Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.c
 
 ## Status
 
-This is the initial scaffold — app shell, layout and CI/release pipeline. Nothing below is
-wired to real DNS lookups yet.
+The window workflow from the original `.cmd` tool is implemented: paste domains/IPs, resolve
+them against a configurable target DNS and reference DNS, and export the results.
 
 | Feature (from the original `.cmd` tool) | Status |
 | --- | --- |
-| App shell: header, input/results panes, status bar | ✅ done (placeholder data) |
+| App shell: header, input/results panes, status bar | ✅ done |
 | CI: lint, typecheck, tests, debug build | ✅ done |
 | Release: Changesets version PR → tagged draft release w/ installers | ✅ done |
-| Paste domains/IPs and resolve against the ISP + public DNS | 🗒️ planned |
-| Classify each result: `BLOQUEADO` / `NÃO BLOQUEADO` / `NÃO EXISTE` | 🗒️ planned |
-| Reverse (PTR) lookup for pasted IPs — `REVERSO OK` | 🗒️ planned |
-| "Mostrar só bloqueados" filter | 🗒️ planned (toggle exists, not wired up) |
-| "Salvar evidência…" — export a timestamped TXT report | 🗒️ planned |
-| Configurable DNS servers (currently hardcoded to `177.137.208.6` / `8.8.8.8`) | 🗒️ planned |
+| Paste domains/IPs and resolve against the target + public DNS | ✅ done |
+| Classify each result: `BLOQUEADO` / `NÃO BLOQUEADO` / `NÃO EXISTE` / `NÃO RESOLVE` / `SEM RESPOSTA` | ✅ done |
+| Reverse (PTR) lookup for pasted IPs — `REVERSO OK` / `SEM REVERSO` | ✅ done |
+| "Mostrar só bloqueados" filter | ✅ done |
+| "Copiar resultado" — copy the visible rows as TSV | ✅ done |
+| "Salvar CSV…" — export a `;`-delimited CSV | ✅ done |
+| "Salvar evidência…" — export a timestamped TXT report | ✅ done |
+| Configurable DNS servers (defaults to `177.137.208.6` / `8.8.8.8`) | ✅ done |
+| Command-line mode (`<app> lista.txt [dns]`) | 🗒️ planned |
 
 ## Requirements
 
