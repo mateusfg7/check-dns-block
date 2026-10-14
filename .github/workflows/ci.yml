@@ -101,7 +101,11 @@ jobs:
 
   changeset:
     name: Changeset check
-    if: github.event_name == 'pull_request'
+    # The "Version Packages" PR (opened by changesets/action from
+    # changeset-release/main) consumes existing changesets and bumps
+    # versions; it never adds a new changeset for its own diff, so it's
+    # exempt from this check.
+    if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
