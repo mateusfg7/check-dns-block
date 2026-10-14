@@ -1,0 +1,18 @@
+/*
+ * Import order matters: Kumo's `@theme` tokens must be registered before
+ * Tailwind itself, and the `@source` directive is needed because Tailwind
+ * v4 doesn't scan node_modules by default.
+ */
+@source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@import "@cloudflare/kumo/styles/tailwind";
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
