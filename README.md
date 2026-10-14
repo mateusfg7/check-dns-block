@@ -1,4 +1,9 @@
+<!-- TODO: replace `mateusfg7/ip-block-checker` below with the real GitHub slug once this repo has a remote. -->
+
 # Verifica Bloqueio DNS
+
+[![CI](https://github.com/mateusfg7/ip-block-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusfg7/ip-block-checker/actions/workflows/ci.yml)
+[![Release](https://github.com/mateusfg7/ip-block-checker/actions/workflows/release.yml/badge.svg)](https://github.com/mateusfg7/ip-block-checker/actions/workflows/release.yml)
 
 Cross-platform rewrite of the original `Verifica-Bloqueio-DNS.cmd` (Windows-only) tool, which
 checks whether a list of domains/IPs is blocked on a given DNS server by comparing its answers
@@ -6,8 +11,25 @@ against a public DNS server (see [`LEIA-ME.txt`](./LEIA-ME.txt) for the original
 
 Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.com/cloudflare/kumo).
 
-> **Status:** this is the initial scaffold — app shell, layout and CI/release pipeline. DNS
-> resolution, evidence export and the "show only blocked" filter are not implemented yet.
+<!-- TODO: swap in a real screenshot once `pnpm tauri dev` has been visually checked. -->
+<!-- ![Verifica Bloqueio DNS screenshot](./docs/screenshot.png) -->
+
+## Status
+
+This is the initial scaffold — app shell, layout and CI/release pipeline. Nothing below is
+wired to real DNS lookups yet.
+
+| Feature (from the original `.cmd` tool) | Status |
+| --- | --- |
+| App shell: header, input/results panes, status bar | ✅ done (placeholder data) |
+| CI: lint, typecheck, tests, debug build | ✅ done |
+| Release: Changesets version PR → tagged draft release w/ installers | ✅ done |
+| Paste domains/IPs and resolve against the ISP + public DNS | 🗒️ planned |
+| Classify each result: `BLOQUEADO` / `NÃO BLOQUEADO` / `NÃO EXISTE` | 🗒️ planned |
+| Reverse (PTR) lookup for pasted IPs — `REVERSO OK` | 🗒️ planned |
+| "Mostrar só bloqueados" filter | 🗒️ planned (toggle exists, not wired up) |
+| "Salvar evidência…" — export a timestamped TXT report | 🗒️ planned |
+| Configurable DNS servers (currently hardcoded to `177.137.208.6` / `8.8.8.8`) | 🗒️ planned |
 
 ## Requirements
 
