@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "changeset": "changeset",
-    "version": "changeset version && node scripts/sync-version.mjs"
+    "version": "changeset version && node scripts/sync-version.mjs",
+    "release:tag": "node scripts/release-tag.mjs"
   },
   "dependencies": {
     "@cloudflare/kumo": "^2.14.0",

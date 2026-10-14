@@ -52,12 +52,21 @@ jobs:
       # On every push to main: if there are pending changesets, opens/updates a
       # "Version Packages" PR. Once that PR is merged (so no changesets remain),
       # this step instead tags the release and sets `published=true`.
+      #
+      # `publish` runs `scripts/release-tag.mjs` rather than `changeset tag`
+      # directly: changesets/action@v1 only flips `published` to `true` for a
+      # root (non-monorepo) package when the publish script's stdout contains
+      # a `New tag: ...` line - the format `changeset publish` prints for an
+      # npm release. `changeset tag` never prints that, so `published` stayed
+      # `false` and the `bundle` job (gated on it) never ran, silently
+      # skipping GitHub Release creation despite the version/changelog bump
+      # landing. The wrapper script tags as before and then emits that line.
       - name: Create release pull request or tag
         id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm run version
-          publish: pnpm changeset tag
+          publish: pnpm run release:tag
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
