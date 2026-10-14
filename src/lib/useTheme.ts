@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
-const STORAGE_KEY = "ip-block-checker.theme";
+const STORAGE_KEY = "check-dns-block.theme";
 
 function getPreferredTheme(): Theme {
   try {

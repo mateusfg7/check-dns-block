@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    ip_block_checker_lib::run()
+    check_dns_block_lib::run()
 }

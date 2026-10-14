@@ -1,5 +1,5 @@
 [package]
-name = "ip-block-checker"
+name = "check-dns-block"
 version = "0.1.0"
 description = "Check DNS Block - checks whether domains/IPs are blocked on a given DNS server"
 authors = ["Mateus Felipe Gonçalves"]
@@ -11,7 +11,7 @@ edition = "2024"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "ip_block_checker_lib"
+name = "check_dns_block_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

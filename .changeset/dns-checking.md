@@ -1,5 +1,5 @@
 ---
-"ip-block-checker": minor
+"check-dns-block": minor
 ---
 
 Implement real DNS block checking: paste domains/IPs, resolve them against a configurable

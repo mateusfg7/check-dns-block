@@ -339,6 +339,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "check-dns-block"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "futures",
+ "hickory-resolver",
+ "idna",
+ "regex",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tokio",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1637,23 +1654,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4200d433cbd5178df7797c9c2e75b348b728e39631cf14520d1e2fc424201f4"
 dependencies = [
  "cfb",
-]
-
-[[package]]
-name = "ip-block-checker"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "futures",
- "hickory-resolver",
- "idna",
- "regex",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tokio",
 ]
 
 [[package]]

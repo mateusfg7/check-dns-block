@@ -1,9 +1,7 @@
-<!-- TODO: replace `mateusfg7/ip-block-checker` below with the real GitHub slug once this repo has a remote. -->
-
 # Check DNS Block
 
-[![CI](https://github.com/mateusfg7/ip-block-checker/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusfg7/ip-block-checker/actions/workflows/ci.yml)
-[![Release](https://github.com/mateusfg7/ip-block-checker/actions/workflows/release.yml/badge.svg)](https://github.com/mateusfg7/ip-block-checker/actions/workflows/release.yml)
+[![CI](https://github.com/mateusfg7/check-dns-block/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusfg7/check-dns-block/actions/workflows/ci.yml)
+[![Release](https://github.com/mateusfg7/check-dns-block/actions/workflows/release.yml/badge.svg)](https://github.com/mateusfg7/check-dns-block/actions/workflows/release.yml)
 
 Cross-platform desktop app that checks whether a list of domains/IPs is blocked on a given
 DNS server, by comparing its answers against a reference DNS server.

@@ -1,5 +1,5 @@
 ---
-"ip-block-checker": minor
+"check-dns-block": minor
 ---
 
 Scaffold Check DNS Block: a Tauri + Rust + React app shell, Kumo-based UI layout, CI (lint,
