@@ -1,6 +1,6 @@
 [package]
 name = "check-dns-block"
-version = "0.1.0"
+version = "0.2.0"
 description = "Check DNS Block - checks whether domains/IPs are blocked on a given DNS server"
 authors = ["Mateus Felipe Gonçalves"]
 edition = "2024"
