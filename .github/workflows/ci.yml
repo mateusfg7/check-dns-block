@@ -102,15 +102,22 @@ jobs:
   flatpak-lint:
     name: Flatpak lint
     runs-on: ubuntu-22.04
+    # Flathub's own linter, run as a container rather than via ubuntu-22.04's
+    # `appstream` apt package (0.15.2): that version is old enough to reject
+    # tags Flathub's actual (much newer) validator requires, like <developer
+    # id="...">, which it needs for domain-ownership verification.
+    container: ghcr.io/flathub/flatpak-builder-lint:latest
     steps:
       - uses: actions/checkout@v4
+      - run: flatpak-builder-lint appstream flatpak/com.mateusf.CheckDNSBlock.metainfo.xml
+      - run: flatpak-builder-lint manifest flatpak/com.mateusf.CheckDNSBlock.yml
 
-      - name: Install AppStream/desktop-file validators
-        run: sudo apt-get update && sudo apt-get install -y appstream desktop-file-utils
-
-      # ubuntu-22.04's `appstream` package is 0.15.2, which doesn't have
-      # --strict (added later) - only --pedantic.
-      - run: appstreamcli validate --pedantic flatpak/com.mateusf.CheckDNSBlock.metainfo.xml
+  desktop-file-lint:
+    name: Desktop file lint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y desktop-file-utils
       - run: desktop-file-validate flatpak/com.mateusf.CheckDNSBlock.desktop
 
   changeset:
