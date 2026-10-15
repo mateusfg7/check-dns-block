@@ -37,6 +37,7 @@ cargo test
 ```
 src/            React frontend (components/, lib/, i18n/)
 src-tauri/      Rust backend (Tauri commands, app config)
+flatpak/        Flatpak manifest, desktop file and AppStream metainfo
 .github/        CI and release workflows
 .changeset/     Pending changesets
 docs/           Contribution and release docs

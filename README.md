@@ -44,6 +44,8 @@ right-click (or Control-click) the app and choose **Open** once to get past that
 
 ### Linux
 
+- **Flatpak (any distro)**: `flatpak install flathub com.mateusf.CheckDNSBlock`, or install the
+  `.flatpak` file from the release with `flatpak install ./check-dns-block_<version>_x86_64.flatpak`
 - **Debian / Ubuntu**: `sudo apt install ./Check.DNS.Block_<version>_amd64.deb`
 - **Fedora / openSUSE / RHEL**: `sudo dnf install ./Check.DNS.Block-<version>-1.x86_64.rpm`
 - **Any distro**: download the `.AppImage`, then
