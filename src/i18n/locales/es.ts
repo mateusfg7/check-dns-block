@@ -10,6 +10,16 @@ export const es: Messages = {
   language: {
     label: "Cambiar idioma",
   },
+  about: {
+    label: "Acerca de",
+    title: "Check DNS Block",
+    description:
+      "Verifica si una lista de dominios/IPs está bloqueada en un servidor DNS determinado, comparando sus respuestas con las de un servidor DNS de referencia.",
+    license: "Licencia MIT · © 2026 Mateus Felipe Gonçalves",
+    madeBy: "Hecho por Mateus Felipe Gonçalves",
+    sourceCode: "Código fuente en GitHub",
+    close: "Cerrar",
+  },
   window: {
     minimize: "Minimizar",
     maximize: "Maximizar",

@@ -3,6 +3,8 @@ name = "check-dns-block"
 version = "0.2.0"
 description = "Check DNS Block - checks whether domains/IPs are blocked on a given DNS server"
 authors = ["Mateus Felipe Gonçalves"]
+license = "MIT"
+repository = "https://github.com/mateusfg7/check-dns-block"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -27,6 +29,7 @@ regex = "1.13.1"
 chrono = { version = "0.4.45", features = ["clock"] }
 tokio = { version = "1.53.3", features = ["rt-multi-thread", "macros"] }
 tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
 idna = "1"
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

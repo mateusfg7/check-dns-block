@@ -1,6 +1,7 @@
 import { Badge, Surface, Text } from "@cloudflare/kumo";
 import { ShieldCheck } from "@phosphor-icons/react";
 import type { AppInfo } from "../lib/types";
+import { AboutDialog } from "./AboutDialog";
 import { LanguageMenu } from "./LanguageMenu";
 import { ThemeToggle } from "./ThemeToggle";
 import { WindowControls } from "./WindowControls";
@@ -38,6 +39,7 @@ export function AppHeader({ appInfo }: AppHeaderProps) {
       </div>
 
       <div className="flex h-full items-center gap-1 pr-1">
+        <AboutDialog appInfo={appInfo} />
         <LanguageMenu />
         <ThemeToggle />
         <span className="mx-1 h-5 w-px bg-kumo-hairline" aria-hidden />

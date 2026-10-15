@@ -14,6 +14,16 @@ export const en = {
   language: {
     label: "Change language",
   },
+  about: {
+    label: "About",
+    title: "Check DNS Block",
+    description:
+      "Checks whether a list of domains/IPs is blocked on a given DNS server, by comparing its answers against a reference DNS server.",
+    license: "MIT License · © 2026 Mateus Felipe Gonçalves",
+    madeBy: "Made by Mateus Felipe Gonçalves",
+    sourceCode: "Source code on GitHub",
+    close: "Close",
+  },
   window: {
     minimize: "Minimize",
     maximize: "Maximize",
