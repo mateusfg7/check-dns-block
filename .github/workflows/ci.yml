@@ -108,7 +108,9 @@ jobs:
       - name: Install AppStream/desktop-file validators
         run: sudo apt-get update && sudo apt-get install -y appstream desktop-file-utils
 
-      - run: appstreamcli validate --strict --pedantic flatpak/com.mateusf.CheckDNSBlock.metainfo.xml
+      # ubuntu-22.04's `appstream` package is 0.15.2, which doesn't have
+      # --strict (added later) - only --pedantic.
+      - run: appstreamcli validate --pedantic flatpak/com.mateusf.CheckDNSBlock.metainfo.xml
       - run: desktop-file-validate flatpak/com.mateusf.CheckDNSBlock.desktop
 
   changeset:
