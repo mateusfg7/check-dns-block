@@ -1,5 +1,17 @@
 # check-dns-block
 
+## 0.3.0
+
+### Minor Changes
+
+- 7341276: Added an About dialog (in the title bar) with the app's license, author credits and a link to
+  the source code. The project is now MIT licensed.
+- 11d57bf: Replaced the native window decorations with a custom title bar that follows the app's light/dark theme and looks the same on Windows, macOS and Linux. Also replaced the placeholder Tauri icon with a proper app icon.
+- 742ad53: Added multi-language support: English (default), Português (Brasil) and Español, switchable from
+  the title bar. The language is detected from the OS on first launch and the choice is remembered
+  afterwards. Exported CSV/evidence files and their default file names now follow the selected
+  language.
+
 ## 0.2.0
 
 ### Minor Changes
