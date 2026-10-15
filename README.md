@@ -17,12 +17,12 @@ Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.c
 ## Features
 
 - Paste domains and/or IPs and resolve them against a configurable target DNS and reference DNS
-- Classify each result: `BLOQUEADO` / `NÃO BLOQUEADO` / `NÃO EXISTE` / `NÃO RESOLVE` /
-  `SEM RESPOSTA`
-- Reverse (PTR) lookup for pasted IPs — `REVERSO OK` / `SEM REVERSO`
-- "Mostrar só bloqueados" filter to show only blocked entries
+- Classify each result: `BLOCKED` / `NOT BLOCKED` / `NOT FOUND` / `NOT RESOLVED` / `NO RESPONSE`
+- Reverse (PTR) lookup for pasted IPs — `REVERSE OK` / `NO REVERSE`
+- "Show only blocked" filter to show only blocked entries
 - Copy results to the clipboard as TSV, or export a `;`-delimited CSV or a timestamped
   evidence report
+- Available in English, Português (Brasil) and Español
 
 ## Getting started
 
