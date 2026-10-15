@@ -15,7 +15,7 @@ env:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +45,7 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v4
 
@@ -101,7 +101,7 @@ jobs:
 
   flatpak-lint:
     name: Flatpak lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     # Flathub's own linter, run as a container rather than via ubuntu-22.04's
     # `appstream` apt package (0.15.2): that version is old enough to reject
     # tags Flathub's actual (much newer) validator requires, like <developer
@@ -120,7 +120,7 @@ jobs:
 
   desktop-file-lint:
     name: Desktop file lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y desktop-file-utils
@@ -133,7 +133,7 @@ jobs:
     # versions; it never adds a new changeset for its own diff, so it's
     # exempt from this check.
     if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v4
         with:
