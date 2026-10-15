@@ -1,4 +1,5 @@
 import { Channel, invoke } from "@tauri-apps/api/core";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { AppInfo, CheckEvent } from "./types";
 
 /** Fallback used in the browser (e.g. `vitest`, `vite dev` outside Tauri). */
@@ -65,5 +66,49 @@ export async function saveTextFile(options: {
     extension: options.extension,
     contents: options.contents,
     bom: options.bom ?? false,
+  });
+}
+
+/** Minimizes the window. No-op outside Tauri. */
+export async function minimizeWindow(): Promise<void> {
+  if (!isTauri()) {
+    return;
+  }
+  await getCurrentWindow().minimize();
+}
+
+/** Toggles between the window's maximized and restored state. No-op outside Tauri. */
+export async function toggleMaximizeWindow(): Promise<void> {
+  if (!isTauri()) {
+    return;
+  }
+  await getCurrentWindow().toggleMaximize();
+}
+
+/** Closes the window. No-op outside Tauri. */
+export async function closeWindow(): Promise<void> {
+  if (!isTauri()) {
+    return;
+  }
+  await getCurrentWindow().close();
+}
+
+/**
+ * Calls `onChange` with the window's current maximized state, then again
+ * every time it changes, so the custom title bar can swap its
+ * maximize/restore icon. Returns a function that stops listening. Outside
+ * Tauri, calls `onChange(false)` once and returns a no-op unsubscribe.
+ */
+export async function onMaximizedChange(
+  onChange: (maximized: boolean) => void,
+): Promise<() => void> {
+  if (!isTauri()) {
+    onChange(false);
+    return () => {};
+  }
+  const win = getCurrentWindow();
+  onChange(await win.isMaximized());
+  return await win.onResized(async () => {
+    onChange(await win.isMaximized());
   });
 }
