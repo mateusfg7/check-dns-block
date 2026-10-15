@@ -28,6 +28,9 @@ function mockCheck(events: CheckEvent[]) {
 }
 
 beforeEach(() => {
+  // Undoes any `vi.spyOn` left over from a previous test (e.g. the OS-language mock below),
+  // before (re)installing the `invoke` mock used by every test.
+  vi.restoreAllMocks();
   localStorage.clear();
   invokeMock.mockReset();
   mockCheck([]);
@@ -143,5 +146,17 @@ describe("App", () => {
 
     // "Limpiar" (es) is distinct from "Limpar" (pt-BR) and "Clear" (en).
     expect(await screen.findByRole("button", { name: "Limpiar" })).toBeInTheDocument();
+  });
+
+  it("shows the license and a link to the source code in the About dialog", async () => {
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "About" }));
+
+    expect(await screen.findByText(/MIT License/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Source code on GitHub/ })).toHaveAttribute(
+      "href",
+      "https://github.com/mateusfg7/check-dns-block",
+    );
   });
 });
