@@ -1,5 +1,6 @@
 import { CopySimple, Minus, Square, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
+import { useI18n } from "../i18n";
 import { closeWindow, minimizeWindow, onMaximizedChange, toggleMaximizeWindow } from "../lib/ipc";
 
 /**
@@ -8,6 +9,7 @@ import { closeWindow, minimizeWindow, onMaximizedChange, toggleMaximizeWindow } 
  * identical on Windows, macOS and Linux.
  */
 export function WindowControls() {
+  const { t } = useI18n();
   const [maximized, setMaximized] = useState(false);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export function WindowControls() {
     <div className="flex h-full items-stretch">
       <button
         type="button"
-        aria-label="Minimizar"
+        aria-label={t.window.minimize}
         className="flex w-11 items-center justify-center text-kumo-default hover:bg-kumo-tint"
         onClick={minimizeWindow}
       >
@@ -38,7 +40,7 @@ export function WindowControls() {
       </button>
       <button
         type="button"
-        aria-label={maximized ? "Restaurar" : "Maximizar"}
+        aria-label={maximized ? t.window.restore : t.window.maximize}
         className="flex w-11 items-center justify-center text-kumo-default hover:bg-kumo-tint"
         onClick={toggleMaximizeWindow}
       >
@@ -46,7 +48,7 @@ export function WindowControls() {
       </button>
       <button
         type="button"
-        aria-label="Fechar"
+        aria-label={t.window.close}
         className="flex w-11 items-center justify-center text-kumo-default hover:bg-red-600 hover:text-white"
         onClick={closeWindow}
       >

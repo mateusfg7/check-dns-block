@@ -1,4 +1,5 @@
 import { Surface, Text } from "@cloudflare/kumo";
+import { useI18n } from "../i18n";
 import { summary } from "../lib/report";
 import type { CheckRow } from "../lib/types";
 import type { CheckStatus } from "../lib/useCheck";
@@ -8,7 +9,7 @@ interface StatusBarProps {
   rows: CheckRow[];
   total: number;
   ignored: number;
-  /** A transient confirmation (e.g. "Salvo em ..."), shown instead of the summary when set. */
+  /** A transient confirmation (e.g. "Saved to ..."), shown instead of the summary when set. */
   feedback?: string | null;
 }
 
@@ -24,6 +25,7 @@ function Stat({ label, value }: { label: string; value: number }) {
 }
 
 export function StatusBar({ status, rows, total, ignored, feedback }: StatusBarProps) {
+  const { t } = useI18n();
   const blocked = rows.filter((row) => row.verdict === "blocked").length;
   const notBlocked = rows.filter(
     (row) => row.verdict === "not_blocked" || row.verdict === "reverse_ok",
@@ -34,11 +36,11 @@ export function StatusBar({ status, rows, total, ignored, feedback }: StatusBarP
   if (feedback) {
     message = feedback;
   } else if (status === "running") {
-    message = `Consultando… ${rows.length} de ${total}`;
+    message = t.status.running(rows.length, total);
   } else if (status === "done") {
-    message = summary(rows);
+    message = summary(rows, t);
     if (ignored > 0) {
-      message += `   (${ignored} trechos ignorados por não serem domínio nem IP)`;
+      message += `   ${t.status.ignored(ignored)}`;
     }
   }
 
@@ -47,10 +49,10 @@ export function StatusBar({ status, rows, total, ignored, feedback }: StatusBarP
       as="footer"
       className="flex flex-wrap items-center gap-6 border-t border-kumo-hairline bg-kumo-elevated px-6 py-3"
     >
-      <Stat label="total" value={rows.length} />
-      <Stat label="bloqueados" value={blocked} />
-      <Stat label="não bloqueados" value={notBlocked} />
-      <Stat label="não existe" value={notFound} />
+      <Stat label={t.status.total} value={rows.length} />
+      <Stat label={t.status.blocked} value={blocked} />
+      <Stat label={t.status.notBlocked} value={notBlocked} />
+      <Stat label={t.status.notFound} value={notFound} />
       {message ? (
         <div className="ml-auto">
           <Text variant="secondary" size="sm">

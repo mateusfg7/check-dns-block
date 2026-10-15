@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { check } from "./ipc";
-import type { CheckEvent, CheckRow } from "./types";
+import type { CheckError, CheckEvent, CheckRow, CheckWarning } from "./types";
 
 export type CheckStatus = "idle" | "running" | "done" | "error";
 
@@ -12,8 +12,8 @@ export interface CheckState {
   server: string;
   /** The reference DNS actually used (may differ from what was requested if it failed preflight). */
   reference: string | null;
-  warning: string | null;
-  error: string | null;
+  warning: CheckWarning | null;
+  error: CheckError | null;
 }
 
 const INITIAL_STATE: CheckState = {
@@ -83,11 +83,11 @@ export function useCheck() {
       if (runId.current !== id) {
         return;
       }
-      setState((prev) => ({
-        ...prev,
-        status: "error",
-        error: err instanceof Error ? err.message : String(err),
-      }));
+      const error: CheckError =
+        err && typeof err === "object" && "code" in err
+          ? (err as CheckError)
+          : { code: "internal", message: err instanceof Error ? err.message : String(err) };
+      setState((prev) => ({ ...prev, status: "error", error }));
     }
   }, []);
 

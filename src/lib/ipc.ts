@@ -1,6 +1,6 @@
 import { Channel, invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import type { AppInfo, CheckEvent } from "./types";
+import type { AppInfo, CheckError, CheckEvent, SaveError } from "./types";
 
 /** Fallback used in the browser (e.g. `vitest`, `vite dev` outside Tauri). */
 export const FALLBACK_APP_INFO: AppInfo = {
@@ -29,7 +29,7 @@ export async function getAppInfo(): Promise<AppInfo> {
  * Parses, preflights and resolves every domain/IP in `input` against
  * `server` (and, optionally, `reference`), calling `onEvent` for each
  * streamed event. Resolves once the backend sends `finished`, or rejects
- * with a user-facing (Portuguese) error message.
+ * with a structured `CheckError` (see `./types`), rendered by `i18n/errors`.
  */
 export async function check(
   input: string,
@@ -38,7 +38,7 @@ export async function check(
   onEvent: (event: CheckEvent) => void,
 ): Promise<void> {
   if (!isTauri()) {
-    throw new Error("A verificação só funciona dentro do aplicativo Check DNS Block.");
+    throw { code: "not_in_app" } satisfies CheckError;
   }
   const channel = new Channel<CheckEvent>();
   channel.onmessage = onEvent;
@@ -48,7 +48,7 @@ export async function check(
 /**
  * Opens a native "save file" dialog pre-filled with `defaultName`, then
  * writes `contents` to the chosen path. Returns the chosen path, or `null`
- * if the dialog was cancelled.
+ * if the dialog was cancelled. Rejects with a structured `SaveError`.
  */
 export async function saveTextFile(options: {
   defaultName: string;
@@ -58,7 +58,7 @@ export async function saveTextFile(options: {
   bom?: boolean;
 }): Promise<string | null> {
   if (!isTauri()) {
-    throw new Error("Salvar arquivos só funciona dentro do aplicativo Check DNS Block.");
+    throw { code: "not_in_app" } satisfies SaveError;
   }
   return invoke<string | null>("save_text_file", {
     defaultName: options.defaultName,

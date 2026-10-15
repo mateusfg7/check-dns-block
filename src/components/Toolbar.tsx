@@ -1,5 +1,6 @@
 import { Button, Switch } from "@cloudflare/kumo";
 import { Broom, ClipboardText, FloppyDisk, MagnifyingGlass } from "@phosphor-icons/react";
+import { useI18n } from "../i18n";
 
 interface ToolbarProps {
   running: boolean;
@@ -14,8 +15,8 @@ interface ToolbarProps {
   onOnlyBlockedChange: (value: boolean) => void;
 }
 
-/** The action row: Verificar/Limpar on the left, the export actions, then
- * the "só bloqueados" filter. */
+/** The action row: Check/Clear on the left, the export actions, then
+ * the "only blocked" filter. */
 export function Toolbar({
   running,
   canVerify,
@@ -28,6 +29,7 @@ export function Toolbar({
   onlyBlocked,
   onOnlyBlockedChange,
 }: ToolbarProps) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Button
@@ -36,10 +38,10 @@ export function Toolbar({
         onClick={onVerify}
         disabled={running || !canVerify}
       >
-        Verificar
+        {t.toolbar.verify}
       </Button>
       <Button variant="secondary" icon={<Broom size={16} />} onClick={onClear} disabled={running}>
-        Limpar
+        {t.toolbar.clear}
       </Button>
       <Button
         variant="secondary"
@@ -47,7 +49,7 @@ export function Toolbar({
         onClick={onCopy}
         disabled={!hasResults}
       >
-        Copiar resultado
+        {t.toolbar.copyResult}
       </Button>
       <Button
         variant="secondary"
@@ -55,7 +57,7 @@ export function Toolbar({
         onClick={onSaveCsv}
         disabled={!hasResults}
       >
-        Salvar CSV…
+        {t.toolbar.saveCsv}
       </Button>
       <Button
         variant="secondary"
@@ -63,10 +65,10 @@ export function Toolbar({
         onClick={onSaveEvidence}
         disabled={!hasResults}
       >
-        Salvar evidência…
+        {t.toolbar.saveEvidence}
       </Button>
       <Switch
-        label="Mostrar só bloqueados"
+        label={t.toolbar.onlyBlocked}
         checked={onlyBlocked}
         onCheckedChange={onOnlyBlockedChange}
         size="sm"
