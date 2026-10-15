@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.mateusf.CheckDNSBlock</id>
+  <name>Check DNS Block</name>
+  <summary>Check whether domains/IPs are blocked on a DNS server</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="com.mateusf">
+    <name translate="no">Mateus Felipe Gonçalves</name>
+  </developer>
+  <url type="homepage">https://github.com/mateusfg7/check-dns-block</url>
+  <url type="bugtracker">https://github.com/mateusfg7/check-dns-block/issues</url>
+  <url type="vcs-browser">https://github.com/mateusfg7/check-dns-block</url>
+  <launchable type="desktop-id">com.mateusf.CheckDNSBlock.desktop</launchable>
+  <description>
+    <p>
+      Check DNS Block is a cross-platform desktop app that checks whether a list of domains
+      and/or IPs is blocked on a given DNS server, by comparing its answers against a reference
+      DNS server.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Paste domains and/or IPs and resolve them against a configurable target and reference DNS</li>
+      <li>Classifies each result: blocked, not blocked, not found, not resolved, or no response</li>
+      <li>Reverse (PTR) lookup for pasted IPs</li>
+      <li>Filter to show only blocked entries</li>
+      <li>Copy results to the clipboard, or export a CSV or evidence report</li>
+      <li>Available in English, Português (Brasil) and Español</li>
+      <li>Light/dark theme</li>
+    </ul>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Checking a list of domains against target and reference DNS servers</caption>
+      <image>https://raw.githubusercontent.com/mateusfg7/check-dns-block/main/docs/screenshot.png</image>
+    </screenshot>
+  </screenshots>
+  <branding>
+    <color type="primary" scheme_preference="light">#056dff</color>
+    <color type="primary" scheme_preference="dark">#056dff</color>
+  </branding>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.3.0" date="2026-10-15">
+      <url>https://github.com/mateusfg7/check-dns-block/releases/tag/v0.3.0</url>
+    </release>
+  </releases>
+</component>
