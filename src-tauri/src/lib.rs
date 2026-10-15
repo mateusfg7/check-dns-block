@@ -34,6 +34,19 @@ fn app_info() -> AppInfo {
     }
 }
 
+/// Set on `CheckEvent::Started` when the reference DNS was requested but
+/// dropped because it failed its own preflight check. The frontend renders
+/// this (and every error/warning below) in the current UI language.
+#[derive(Debug, Clone, Serialize)]
+#[serde(
+    tag = "code",
+    rename_all = "snake_case",
+    rename_all_fields = "camelCase"
+)]
+enum CheckWarning {
+    ReferenceUnreachable { server: String },
+}
+
 /// Streamed over the `check` command's channel so the UI can render rows as
 /// they arrive instead of waiting for every query to finish.
 #[derive(Debug, Clone, Serialize)]
@@ -45,15 +58,30 @@ enum CheckEvent {
         /// The reference DNS actually used, or `None` if it was dropped
         /// (missing, or it failed its own preflight check).
         reference: Option<String>,
-        /// Set when the reference DNS was requested but dropped.
-        warning: Option<String>,
+        warning: Option<CheckWarning>,
     },
     Row(CheckRow),
     Finished,
 }
 
-fn parse_server(raw: &str, error: &str) -> Result<IpAddr, String> {
-    raw.trim().parse().map_err(|_| error.to_string())
+/// Returned to the frontend when the `check` command fails. Structured
+/// instead of a ready-made message, so the UI can render it translated.
+#[derive(Debug, Clone, Serialize)]
+#[serde(
+    tag = "code",
+    rename_all = "snake_case",
+    rename_all_fields = "camelCase"
+)]
+enum CheckError {
+    InvalidServer,
+    InvalidReference,
+    NoEntries,
+    ServerUnreachable { server: String, control: String },
+    Internal { message: String },
+}
+
+fn parse_server(raw: &str, error: CheckError) -> Result<IpAddr, CheckError> {
+    raw.trim().parse().map_err(|_| error)
 }
 
 /// Runs a preflight query for [`CONTROL_DOMAIN`] against `resolver`, to check
@@ -74,40 +102,38 @@ async fn check(
     server: String,
     reference: Option<String>,
     on_event: Channel<CheckEvent>,
-) -> Result<(), String> {
-    let server_ip = parse_server(&server, "Informe o IP do servidor DNS a consultar.")?;
+) -> Result<(), CheckError> {
+    let server_ip = parse_server(&server, CheckError::InvalidServer)?;
     let mut reference_ip = match reference.as_deref().map(str::trim) {
         None | Some("") => None,
-        Some(raw) => Some(parse_server(
-            raw,
-            "Informe o IP do DNS público de comparação ou desmarque a opção.",
-        )?),
+        Some(raw) => Some(parse_server(raw, CheckError::InvalidReference)?),
     };
 
     let parsed = dns::parse_entries(&input);
     if parsed.entries.is_empty() {
-        return Err("Cole pelo menos um domínio ou IP válido.".to_string());
+        return Err(CheckError::NoEntries);
     }
 
-    let target_resolver = dns::build_resolver(server_ip)?;
+    let target_resolver =
+        dns::build_resolver(server_ip).map_err(|message| CheckError::Internal { message })?;
     if !is_server_reachable(&target_resolver).await {
-        return Err(format!(
-            "O servidor {server_ip} não respondeu a consulta de teste ({CONTROL_DOMAIN}).\n\n\
-             Este computador precisa estar na rede atendida por esse DNS."
-        ));
+        return Err(CheckError::ServerUnreachable {
+            server: server_ip.to_string(),
+            control: CONTROL_DOMAIN.to_string(),
+        });
     }
 
     let mut warning = None;
     let reference_resolver = match reference_ip {
         Some(ip) => {
-            let resolver = dns::build_resolver(ip)?;
+            let resolver =
+                dns::build_resolver(ip).map_err(|message| CheckError::Internal { message })?;
             if is_server_reachable(&resolver).await {
                 Some(resolver)
             } else {
-                warning = Some(format!(
-                    "O DNS público {ip} não respondeu daqui. A verificação segue sem comparação: \
-                     o que não resolver aparece como NÃO RESOLVE."
-                ));
+                warning = Some(CheckWarning::ReferenceUnreachable {
+                    server: ip.to_string(),
+                });
                 reference_ip = None;
                 None
             }
@@ -122,7 +148,9 @@ async fn check(
             reference: reference_ip.map(|ip| ip.to_string()),
             warning,
         })
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| CheckError::Internal {
+            message: e.to_string(),
+        })?;
 
     let target_resolver = &target_resolver;
     let reference_resolver = &reference_resolver;
@@ -134,11 +162,11 @@ async fn check(
                 None => None,
             };
             let verdict = dns::classify(entry.kind, &target_answer, reference_answer.as_ref());
-            let checked_at = chrono::Local::now().format("%d/%m/%Y %H:%M:%S").to_string();
+            let checked_at = chrono::Local::now().timestamp_millis();
             CheckRow {
                 index,
-                target_answer: dns::answer_text(&target_answer, entry.kind),
-                reference_answer: reference_answer.map(|a| dns::answer_text(&a, entry.kind)),
+                target_answer,
+                reference_answer,
                 entry: entry.name,
                 kind: entry.kind,
                 verdict,
@@ -159,6 +187,18 @@ async fn check(
     Ok(())
 }
 
+/// Returned to the frontend when the `save_text_file` command fails.
+#[derive(Debug, Clone, Serialize)]
+#[serde(
+    tag = "code",
+    rename_all = "snake_case",
+    rename_all_fields = "camelCase"
+)]
+enum SaveError {
+    DialogFailed,
+    WriteFailed { message: String },
+}
+
 /// Opens a native "save file" dialog pre-filled with `default_name`, then
 /// writes `contents` to the chosen path (UTF-8, with a BOM when `bom` is
 /// true — Excel needs it to open accented CSVs correctly). Returns the
@@ -171,7 +211,7 @@ async fn save_text_file(
     extension: String,
     contents: String,
     bom: bool,
-) -> Result<Option<String>, String> {
+) -> Result<Option<String>, SaveError> {
     let (tx, rx) = tokio::sync::oneshot::channel();
     app.dialog()
         .file()
@@ -181,13 +221,12 @@ async fn save_text_file(
             let _ = tx.send(path);
         });
 
-    let Some(path) = rx
-        .await
-        .map_err(|_| "Falha ao abrir a caixa de diálogo.".to_string())?
-    else {
+    let Some(path) = rx.await.map_err(|_| SaveError::DialogFailed)? else {
         return Ok(None);
     };
-    let path = path.into_path().map_err(|e| e.to_string())?;
+    let path = path.into_path().map_err(|e| SaveError::WriteFailed {
+        message: e.to_string(),
+    })?;
 
     let mut bytes = Vec::with_capacity(contents.len() + 3);
     if bom {
@@ -197,7 +236,9 @@ async fn save_text_file(
 
     tokio::fs::write(&path, bytes)
         .await
-        .map_err(|e| format!("Não foi possível salvar: {e}"))?;
+        .map_err(|e| SaveError::WriteFailed {
+            message: e.to_string(),
+        })?;
 
     Ok(Some(path.display().to_string()))
 }
@@ -209,4 +250,51 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![app_info, check, save_text_file])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn check_error_serializes_as_tagged_struct() {
+        assert_eq!(
+            serde_json::to_string(&CheckError::InvalidServer).unwrap(),
+            r#"{"code":"invalid_server"}"#
+        );
+        assert_eq!(
+            serde_json::to_string(&CheckError::ServerUnreachable {
+                server: "1.2.3.4".into(),
+                control: "google.com".into(),
+            })
+            .unwrap(),
+            r#"{"code":"server_unreachable","server":"1.2.3.4","control":"google.com"}"#
+        );
+    }
+
+    #[test]
+    fn check_warning_serializes_as_tagged_struct() {
+        assert_eq!(
+            serde_json::to_string(&CheckWarning::ReferenceUnreachable {
+                server: "8.8.8.8".into(),
+            })
+            .unwrap(),
+            r#"{"code":"reference_unreachable","server":"8.8.8.8"}"#
+        );
+    }
+
+    #[test]
+    fn save_error_serializes_as_tagged_struct() {
+        assert_eq!(
+            serde_json::to_string(&SaveError::DialogFailed).unwrap(),
+            r#"{"code":"dialog_failed"}"#
+        );
+        assert_eq!(
+            serde_json::to_string(&SaveError::WriteFailed {
+                message: "boom".into(),
+            })
+            .unwrap(),
+            r#"{"code":"write_failed","message":"boom"}"#
+        );
+    }
 }

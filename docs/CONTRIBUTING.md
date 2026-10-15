@@ -35,12 +35,21 @@ cargo test
 ## Project layout
 
 ```
-src/            React frontend (components/, lib/)
+src/            React frontend (components/, lib/, i18n/)
 src-tauri/      Rust backend (Tauri commands, app config)
 .github/        CI and release workflows
 .changeset/     Pending changesets
 docs/           Contribution and release docs
 ```
+
+## Adding a language
+
+The UI, exports and file names are all driven by `src/i18n/`:
+
+1. Add `src/i18n/locales/<code>.ts`, typed as `Messages` (from `./en`) so a missing key fails
+   `pnpm typecheck`.
+2. Register it in `LOCALES` and `MESSAGES` in `src/i18n/index.tsx`.
+3. If the language should be auto-detected from the OS, extend `detectLocale` in the same file.
 
 ## Submitting changes
 

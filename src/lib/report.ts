@@ -1,36 +1,30 @@
 /**
  * Pure formatting helpers for the result table, CSV export, clipboard copy
- * and the evidence report.
+ * and the evidence report. Everything here is rendered in the current UI
+ * language via the `Messages` dictionary passed in by the caller.
  */
-import type { CheckRow, EntryKind, Verdict } from "./types";
+import { pad2 } from "../i18n/format";
+import type { Messages } from "../i18n/locales/en";
+import type { Answer, CheckRow, EntryKind, Verdict } from "./types";
 
-/** Portuguese label for each verdict, as shown in the UI and reports. */
-export const VERDICT_LABEL: Record<Verdict, string> = {
-  blocked: "BLOQUEADO",
-  not_blocked: "NÃO BLOQUEADO",
-  unresolved: "NÃO RESOLVE",
-  no_response: "SEM RESPOSTA",
-  not_found: "NÃO EXISTE",
-  reverse_ok: "REVERSO OK",
-  no_reverse: "SEM REVERSO",
-};
-
-/** Portuguese label for each entry kind, as shown in the UI and reports. */
-export const TIPO_LABEL: Record<EntryKind, string> = {
-  domain: "Domínio",
-  ip: "IP",
-};
-
-function pad2(n: number): string {
-  return n.toString().padStart(2, "0");
-}
-
-/** Formats a local timestamp as `dd/MM/yyyy HH:mm:ss`. */
-export function formatTimestamp(date: Date): string {
-  const day = pad2(date.getDate());
-  const month = pad2(date.getMonth() + 1);
-  const time = `${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
-  return `${day}/${month}/${date.getFullYear()} ${time}`;
+/** Renders an `Answer` as short text in the given language. */
+export function answerText(answer: Answer, kind: EntryKind, t: Messages): string {
+  switch (answer.type) {
+    case "ok":
+      return answer.value.join(", ");
+    case "nx_domain":
+      return t.answer.nxDomain;
+    case "serv_fail":
+      return t.answer.servFail;
+    case "refused":
+      return t.answer.refused;
+    case "timeout":
+      return t.answer.timeout;
+    case "empty":
+      return kind === "ip" ? t.answer.emptyIp : t.answer.emptyDomain;
+    case "error":
+      return t.answer.error(answer.value);
+  }
 }
 
 /** Formats the local UTC offset as `UTC+hh:mm` / `UTC-hh:mm`. */
@@ -41,8 +35,8 @@ export function formatUtcOffsetLabel(date: Date): string {
   return `UTC${sign}${pad2(Math.floor(abs / 60))}:${pad2(abs % 60)}`;
 }
 
-/** `"N verificados: 3 BLOQUEADO | 2 NÃO BLOQUEADO | ..."`, most frequent first. */
-export function summary(rows: CheckRow[]): string {
+/** `"N checked: 3 BLOCKED | 2 NOT BLOCKED | ..."`, most frequent first. */
+export function summary(rows: CheckRow[], t: Messages): string {
   const order: Verdict[] = [];
   const counts = new Map<Verdict, number>();
   for (const row of rows) {
@@ -53,8 +47,8 @@ export function summary(rows: CheckRow[]): string {
   }
   const parts = [...order]
     .sort((a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0))
-    .map((verdict) => `${counts.get(verdict)} ${VERDICT_LABEL[verdict]}`);
-  return `${rows.length} verificados: ${parts.join(" | ")}`;
+    .map((verdict) => `${counts.get(verdict)} ${t.verdict[verdict]}`);
+  return `${t.report.summaryPrefix(rows.length)} ${parts.join(" | ")}`;
 }
 
 function csvField(value: string): string {
@@ -67,40 +61,68 @@ function csvField(value: string): string {
 /**
  * `;`-delimited CSV (UTF-8, BOM added separately by the save command so
  * Excel opens accented text correctly). The reference column is always
- * present, labelled "Referência" when no reference DNS was used.
+ * present, labelled with `table.referenceColumnLabel` when no reference DNS
+ * was used.
  */
-export function toCsv(rows: CheckRow[], server: string, reference: string | null): string {
-  const refHeader = reference ? `Resposta ${reference}` : "Referência";
-  const header = ["Entrada", "Tipo", "Situação", `Resposta ${server}`, refHeader, "Consultado em"];
+export function toCsv(
+  rows: CheckRow[],
+  server: string,
+  reference: string | null,
+  t: Messages,
+): string {
+  const refHeader = reference ? t.table.columnAnswer(reference) : t.table.referenceColumnLabel;
+  const header = [
+    t.table.columnEntry,
+    t.table.columnType,
+    t.table.columnStatus,
+    t.table.columnAnswer(server),
+    refHeader,
+    t.table.columnCheckedAt,
+  ];
   const body = rows.map((row) => [
     row.entry,
-    TIPO_LABEL[row.kind],
-    VERDICT_LABEL[row.verdict],
-    row.targetAnswer,
-    row.referenceAnswer ?? "",
-    row.checkedAt,
+    t.kind[row.kind],
+    t.verdict[row.verdict],
+    answerText(row.targetAnswer, row.kind, t),
+    row.referenceAnswer ? answerText(row.referenceAnswer, row.kind, t) : "",
+    t.formatDateTime(new Date(row.checkedAt)),
   ]);
   return `${[header, ...body].map((cols) => cols.map(csvField).join(";")).join("\r\n")}\r\n`;
 }
 
 /**
- * Tab-separated text for the clipboard ("Copiar resultado"). Unlike the
- * CSV export, the reference column is omitted entirely when no reference
- * DNS was used.
+ * Tab-separated text for the clipboard ("Copy result"). Unlike the CSV
+ * export, the reference column is omitted entirely when no reference DNS
+ * was used.
  */
-export function toTsv(rows: CheckRow[], server: string, reference: string | null): string {
-  const header = ["Entrada", "Tipo", "Situação", `Resposta ${server}`];
+export function toTsv(
+  rows: CheckRow[],
+  server: string,
+  reference: string | null,
+  t: Messages,
+): string {
+  const header = [
+    t.table.columnEntry,
+    t.table.columnType,
+    t.table.columnStatus,
+    t.table.columnAnswer(server),
+  ];
   if (reference) {
-    header.push(`Resposta ${reference}`);
+    header.push(t.table.columnAnswer(reference));
   }
-  header.push("Consultado em");
+  header.push(t.table.columnCheckedAt);
 
   const body = rows.map((row) => {
-    const cols = [row.entry, TIPO_LABEL[row.kind], VERDICT_LABEL[row.verdict], row.targetAnswer];
+    const cols = [
+      row.entry,
+      t.kind[row.kind],
+      t.verdict[row.verdict],
+      answerText(row.targetAnswer, row.kind, t),
+    ];
     if (reference) {
-      cols.push(row.referenceAnswer ?? "");
+      cols.push(row.referenceAnswer ? answerText(row.referenceAnswer, row.kind, t) : "");
     }
-    cols.push(row.checkedAt);
+    cols.push(t.formatDateTime(new Date(row.checkedAt)));
     return cols;
   });
   return [header, ...body].map((cols) => cols.join("\t")).join("\r\n");
@@ -108,64 +130,71 @@ export function toTsv(rows: CheckRow[], server: string, reference: string | null
 
 /**
  * Evidence report: blocked domains first (with timestamps), then every
- * other entry, followed by the criteria used. Mirrors `Para-Evidencia`.
+ * other entry, followed by the criteria used.
  */
 export function toEvidence(
   rows: CheckRow[],
   server: string,
   reference: string | null,
   generatedAt: Date,
+  t: Messages,
 ): string {
   const blocked = rows.filter((row) => row.verdict === "blocked");
   const rest = rows.filter((row) => row.verdict !== "blocked");
   const width = Math.max(20, ...rows.map((row) => row.entry.length)) + 2;
+  const verdictWidth = Math.max(...Object.values(t.verdict).map((label) => label.length)) + 2;
+  const headerLabels = [t.report.generatedAt, t.report.queriedServer, t.report.result];
+  if (reference) {
+    headerLabels.push(t.report.compareServer);
+  }
+  const headerWidth = Math.max(...headerLabels.map((label) => label.length)) + 1;
+
+  const answer = (row: CheckRow) => answerText(row.targetAnswer, row.kind, t);
+  const referenceAnswer = (row: CheckRow) =>
+    row.referenceAnswer ? answerText(row.referenceAnswer, row.kind, t) : "";
 
   const lines: string[] = [];
-  lines.push("EVIDÊNCIA DE BLOQUEIO DE DOMÍNIOS NO DNS RECURSIVO");
+  lines.push(t.report.evidenceTitle);
   lines.push("=".repeat(50));
   lines.push(
-    `Gerado em:               ${formatTimestamp(generatedAt)} (${formatUtcOffsetLabel(generatedAt)})`,
+    `${t.report.generatedAt.padEnd(headerWidth)}${t.formatDateTime(generatedAt)} (${formatUtcOffsetLabel(generatedAt)})`,
   );
-  lines.push(`Servidor DNS consultado: ${server}`);
+  lines.push(`${t.report.queriedServer.padEnd(headerWidth)}${server}`);
   if (reference) {
-    lines.push(`DNS público de comparação: ${reference}`);
+    lines.push(`${t.report.compareServer.padEnd(headerWidth)}${reference}`);
   }
-  lines.push(`Resultado:               ${summary(rows)}`);
+  lines.push(`${t.report.result.padEnd(headerWidth)}${summary(rows, t)}`);
   lines.push("");
-  lines.push(`DOMÍNIOS BLOQUEADOS (${blocked.length})`);
+  lines.push(t.report.blockedDomains(blocked.length));
   lines.push("-".repeat(50));
   if (blocked.length === 0) {
-    lines.push("(nenhum)");
+    lines.push(t.report.none);
   } else {
     for (const row of blocked) {
-      let line = `${row.checkedAt}  ${row.entry.padEnd(width)}BLOQUEADO  ${server}: ${row.targetAnswer}`;
+      let line = `${t.formatDateTime(new Date(row.checkedAt))}  ${row.entry.padEnd(width)}${t.verdict.blocked}  ${server}: ${answer(row)}`;
       if (reference) {
-        line += `  |  ${reference}: ${row.referenceAnswer ?? ""}`;
+        line += `  |  ${reference}: ${referenceAnswer(row)}`;
       }
       lines.push(line);
     }
   }
   if (rest.length > 0) {
     lines.push("");
-    lines.push(`DEMAIS ENTRADAS (${rest.length})`);
+    lines.push(t.report.otherEntries(rest.length));
     lines.push("-".repeat(50));
     for (const row of rest) {
-      let line = `${row.checkedAt}  ${row.entry.padEnd(width)}${VERDICT_LABEL[row.verdict].padEnd(15)}${server}: ${row.targetAnswer}`;
+      let line = `${t.formatDateTime(new Date(row.checkedAt))}  ${row.entry.padEnd(width)}${t.verdict[row.verdict].padEnd(verdictWidth)}${server}: ${answer(row)}`;
       if (reference) {
-        line += `  |  ${reference}: ${row.referenceAnswer ?? ""}`;
+        line += `  |  ${reference}: ${referenceAnswer(row)}`;
       }
       lines.push(line);
     }
   }
   lines.push("");
-  lines.push(
-    "Critério: BLOQUEADO = o servidor consultado não resolve o domínio (ou devolve 0.0.0.0/127.x)",
-  );
+  lines.push(t.report.criteriaBlocked);
   if (reference) {
-    lines.push(
-      `enquanto o DNS público ${reference} resolve normalmente. NÃO EXISTE = não resolve em nenhum dos dois.`,
-    );
+    lines.push(t.report.criteriaWithReference(reference));
   }
-  lines.push(`Conferência manual: nslookup <domínio> ${server}`);
+  lines.push(t.report.manualCheck(server));
   return lines.join("\r\n");
 }
