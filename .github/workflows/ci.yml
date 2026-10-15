@@ -99,6 +99,18 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm tauri build --debug --no-bundle
 
+  flatpak-lint:
+    name: Flatpak lint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install AppStream/desktop-file validators
+        run: sudo apt-get update && sudo apt-get install -y appstream desktop-file-utils
+
+      - run: appstreamcli validate --strict --pedantic flatpak/com.mateusf.CheckDNSBlock.metainfo.xml
+      - run: desktop-file-validate flatpak/com.mateusf.CheckDNSBlock.desktop
+
   changeset:
     name: Changeset check
     # The "Version Packages" PR (opened by changesets/action from
