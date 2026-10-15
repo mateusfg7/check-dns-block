@@ -63,7 +63,7 @@ jobs:
       # landing. The wrapper script tags as before and then emits that line.
       - name: Create release pull request or tag
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2.1.2
         with:
           version: pnpm run version
           publish: pnpm run release:tag
