@@ -1,5 +1,12 @@
 # check-dns-block
 
+## 0.4.1
+
+### Patch Changes
+
+- 1cd29c7: Fixed the Flatpak build failing on its first step: the vendored pnpm release tarball carries macOS
+  file ownership that an unprivileged `tar` inside the build sandbox couldn't apply.
+
 ## 0.4.0
 
 ### Minor Changes
