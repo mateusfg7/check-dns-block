@@ -108,10 +108,14 @@ pub fn parse_entries(text: &str) -> ParsedInput {
     ParsedInput { entries, ignored }
 }
 
-/// Outcome of a single DNS query against one server.
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// Outcome of a single DNS query against one server. Sent to the frontend
+/// as structured data (`{"type":"ok","value":[...]}`, `{"type":"nx_domain"}`,
+/// `{"type":"error","value":"..."}`) so it can be rendered in the current UI
+/// language instead of baking Portuguese text into the backend.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "type", content = "value", rename_all = "snake_case")]
 pub enum Answer {
-    /// Resolved successfully; the joined, human-readable values (IPs or PTR names).
+    /// Resolved successfully; the raw values (IPs or PTR names).
     Ok(Vec<String>),
     NxDomain,
     ServFail,
@@ -179,25 +183,6 @@ pub fn classify(kind: EntryKind, target: &Answer, reference: Option<&Answer>) ->
     }
 }
 
-/// Renders an answer as the short Portuguese text shown in the UI/reports.
-pub fn answer_text(answer: &Answer, kind: EntryKind) -> String {
-    match answer {
-        Answer::Ok(values) => values.join(", "),
-        Answer::NxDomain => "não resolve (NXDOMAIN)".to_string(),
-        Answer::ServFail => "falha (SERVFAIL)".to_string(),
-        Answer::Refused => "recusado (REFUSED)".to_string(),
-        Answer::Timeout => "sem resposta".to_string(),
-        Answer::Empty => {
-            if kind == EntryKind::Ip {
-                "sem reverso".to_string()
-            } else {
-                "sem registro A".to_string()
-            }
-        }
-        Answer::Error(msg) => format!("erro: {msg}"),
-    }
-}
-
 /// Result row for a single checked entry, sent to the frontend.
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -208,10 +193,11 @@ pub struct CheckRow {
     pub entry: String,
     pub kind: EntryKind,
     pub verdict: Verdict,
-    pub target_answer: String,
-    pub reference_answer: Option<String>,
-    /// Local timestamp formatted as `dd/MM/yyyy HH:mm:ss`.
-    pub checked_at: String,
+    pub target_answer: Answer,
+    pub reference_answer: Option<Answer>,
+    /// Local timestamp, as epoch milliseconds — the frontend formats it in
+    /// the current UI language/locale.
+    pub checked_at: i64,
 }
 
 /// Builds a resolver that only talks to `server`, with no caching and no
@@ -467,38 +453,18 @@ mod tests {
     }
 
     #[test]
-    fn answer_text_matches_expected_strings() {
+    fn answer_serializes_as_tagged_struct() {
         assert_eq!(
-            answer_text(
-                &Answer::Ok(vec!["1.1.1.1".into(), "2.2.2.2".into()]),
-                EntryKind::Domain
-            ),
-            "1.1.1.1, 2.2.2.2"
+            serde_json::to_string(&Answer::Ok(vec!["1.1.1.1".into(), "2.2.2.2".into()])).unwrap(),
+            r#"{"type":"ok","value":["1.1.1.1","2.2.2.2"]}"#
         );
         assert_eq!(
-            answer_text(&Answer::NxDomain, EntryKind::Domain),
-            "não resolve (NXDOMAIN)"
+            serde_json::to_string(&Answer::NxDomain).unwrap(),
+            r#"{"type":"nx_domain"}"#
         );
         assert_eq!(
-            answer_text(&Answer::ServFail, EntryKind::Domain),
-            "falha (SERVFAIL)"
-        );
-        assert_eq!(
-            answer_text(&Answer::Refused, EntryKind::Domain),
-            "recusado (REFUSED)"
-        );
-        assert_eq!(
-            answer_text(&Answer::Timeout, EntryKind::Domain),
-            "sem resposta"
-        );
-        assert_eq!(
-            answer_text(&Answer::Empty, EntryKind::Domain),
-            "sem registro A"
-        );
-        assert_eq!(answer_text(&Answer::Empty, EntryKind::Ip), "sem reverso");
-        assert_eq!(
-            answer_text(&Answer::Error("boom".into()), EntryKind::Domain),
-            "erro: boom"
+            serde_json::to_string(&Answer::Error("boom".into())).unwrap(),
+            r#"{"type":"error","value":"boom"}"#
         );
     }
 
