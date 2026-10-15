@@ -26,7 +26,30 @@ Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.c
 - 🌐 Available in English, Português (Brasil) and Español
 - 🌗 Light/dark theme, with a custom title bar on every platform
 
-## Getting started
+## Installation
+
+Download the build for your platform from the
+[latest release](https://github.com/mateusfg7/check-dns-block/releases/latest).
+
+### Windows
+
+Run the `..._x64-setup.exe` installer (or `..._x64_en-US.msi`) and follow the prompts.
+
+### macOS
+
+Open the `..._universal.dmg` (works on both Apple Silicon and Intel) and drag
+**Check DNS Block** into Applications. The app isn't signed/notarized, so macOS will refuse to
+open it the first time ("cannot be opened because it is from an unidentified developer") —
+right-click (or Control-click) the app and choose **Open** once to get past that.
+
+### Linux
+
+- **Debian / Ubuntu**: `sudo apt install ./Check.DNS.Block_<version>_amd64.deb`
+- **Fedora / openSUSE / RHEL**: `sudo dnf install ./Check.DNS.Block-<version>-1.x86_64.rpm`
+- **Any distro**: download the `.AppImage`, then
+  `chmod +x Check.DNS.Block_<version>_amd64.AppImage && ./Check.DNS.Block_<version>_amd64.AppImage`
+
+## Building from source
 
 ```bash
 pnpm install
