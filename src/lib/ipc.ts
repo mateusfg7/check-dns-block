@@ -1,5 +1,6 @@
 import { Channel, invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import type { AppInfo, CheckError, CheckEvent, SaveError } from "./types";
 
 /** Fallback used in the browser (e.g. `vitest`, `vite dev` outside Tauri). */
@@ -67,6 +68,20 @@ export async function saveTextFile(options: {
     contents: options.contents,
     bom: options.bom ?? false,
   });
+}
+
+/**
+ * Opens `url` in the system's default browser. Inside Tauri this goes
+ * through the opener plugin, since a plain `<a target="_blank">` would
+ * otherwise navigate the app's own webview; outside Tauri it falls back to
+ * `window.open`, same pattern as the other helpers here.
+ */
+export async function openExternal(url: string): Promise<void> {
+  if (!isTauri()) {
+    window.open(url, "_blank", "noopener,noreferrer");
+    return;
+  }
+  await openUrl(url);
 }
 
 /** Minimizes the window. No-op outside Tauri. */
