@@ -44,7 +44,16 @@ modules:
       # node-sources.json's own prescribed setup (printed by
       # flatpak-node-generator when run with `pnpm` as the package manager).
       - python3 flatpak-node/populate_pnpm_store.py flatpak-node/pnpm-manifest.json flatpak-node/pnpm-tarballs flatpak-node/pnpm-store
-      - echo "store-dir=$PWD/flatpak-node/pnpm-store" >> .npmrc
+      # Since pnpm 11, .npmrc only reads auth/registry settings - storeDir
+      # has to go in pnpm-workspace.yaml instead, or pnpm silently ignores
+      # it and falls back to its (empty, in the sandbox) default store.
+      # minimumReleaseAge also defaults to 1440 (minutes) since pnpm 11,
+      # which makes pnpm check every package's publish time against the
+      # registry regardless of --offline - disable it for this offline
+      # build, since there's no registry to check against anyway and the
+      # vendored sources already come from the committed, reviewed lockfile.
+      - |
+        printf 'storeDir: %s/flatpak-node/pnpm-store\nminimumReleaseAge: 0\n' "$PWD" >> pnpm-workspace.yaml
       - PATH="$PWD/pnpm-bin:$PATH" pnpm install --offline --frozen-lockfile
       - PATH="$PWD/pnpm-bin:$PATH" pnpm build
       # `--config` merges src-tauri/tauri.flatpak.conf.json over the normal
