@@ -110,7 +110,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: flatpak-builder-lint appstream flatpak/com.mateusf.CheckDNSBlock.metainfo.xml
-      - run: flatpak-builder-lint manifest flatpak/com.mateusf.CheckDNSBlock.yml
+      # Not `flatpak-builder-lint manifest` here: it resolves the manifest's
+      # `generated-sources/*.json` module sources for real (via
+      # libflatpak-builder), which only exist after `pnpm flatpak:sources`
+      # runs - this job stays fast/network-light, so that check happens
+      # where the sources actually get generated, in the `flatpak` release
+      # job (a full `flatpak-builder` build there is a stronger check of the
+      # manifest anyway).
 
   desktop-file-lint:
     name: Desktop file lint
