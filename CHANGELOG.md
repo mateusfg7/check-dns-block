@@ -1,5 +1,12 @@
 # check-dns-block
 
+## 0.4.0
+
+### Minor Changes
+
+- 71c9da2: Added Flatpak packaging. Every release now also attaches a `.flatpak` bundle, and the app is
+  submitted to Flathub as `com.mateusf.CheckDNSBlock`.
+
 ## 0.3.0
 
 ### Minor Changes
