@@ -124,3 +124,75 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.settings.args || '' }}
+
+  flatpak-sources:
+    name: Flatpak sources
+    needs: changesets
+    if: needs.changesets.outputs.published == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+      # The `changesets` job already tagged this exact commit on `main`, so
+      # the default checkout ref is correct.
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - run: pnpm install --frozen-lockfile
+      - run: ./scripts/flatpak-sources.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flatpak-generated-sources
+          path: flatpak/generated-sources/
+          retention-days: 1
+
+  flatpak:
+    name: Flatpak bundle
+    needs: [changesets, bundle, flatpak-sources]
+    if: needs.changesets.outputs.published == 'true'
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: flatpak-generated-sources
+          path: flatpak/generated-sources/
+
+      - name: Build Flatpak bundle
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: check-dns-block_${{ fromJSON(needs.changesets.outputs.publishedPackages)[0].version }}_x86_64.flatpak
+          manifest-path: flatpak/com.mateusf.CheckDNSBlock.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flatpak-bundle
+          path: "*.flatpak"
+          retention-days: 1
+
+  flatpak-release:
+    name: Attach Flatpak bundle to release
+    needs: [changesets, flatpak]
+    # No `gh`/privileged container here (the builder image may not ship
+    # `gh`), so this uploads from a plain runner instead.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: flatpak-bundle
+
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "v${{ fromJSON(needs.changesets.outputs.publishedPackages)[0].version }}" *.flatpak --repo "$GITHUB_REPOSITORY"

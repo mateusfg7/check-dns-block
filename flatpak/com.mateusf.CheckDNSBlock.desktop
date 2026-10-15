@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Check DNS Block
+Comment=Check whether domains/IPs are blocked on a given DNS server
+Exec=check-dns-block
+Icon=com.mateusf.CheckDNSBlock
+Terminal=false
+Categories=Network;
+Keywords=dns;block;domain;firewall;censorship;
+StartupWMClass=com.mateusf.CheckDNSBlock

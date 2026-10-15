@@ -18,7 +18,8 @@
     "test:watch": "vitest",
     "changeset": "changeset",
     "version": "changeset version && node scripts/sync-version.mjs",
-    "release:tag": "node scripts/release-tag.mjs"
+    "release:tag": "node scripts/release-tag.mjs",
+    "flatpak:sources": "scripts/flatpak-sources.sh"
   },
   "dependencies": {
     "@cloudflare/kumo": "^2.14.0",

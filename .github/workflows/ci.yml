@@ -99,6 +99,33 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm tauri build --debug --no-bundle
 
+  flatpak-lint:
+    name: Flatpak lint
+    runs-on: ubuntu-22.04
+    # Flathub's own linter, run as a container rather than via ubuntu-22.04's
+    # `appstream` apt package (0.15.2): that version is old enough to reject
+    # tags Flathub's actual (much newer) validator requires, like <developer
+    # id="...">, which it needs for domain-ownership verification.
+    container: ghcr.io/flathub/flatpak-builder-lint:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: flatpak-builder-lint appstream flatpak/com.mateusf.CheckDNSBlock.metainfo.xml
+      # Not `flatpak-builder-lint manifest` here: it resolves the manifest's
+      # `generated-sources/*.json` module sources for real (via
+      # libflatpak-builder), which only exist after `pnpm flatpak:sources`
+      # runs - this job stays fast/network-light, so that check happens
+      # where the sources actually get generated, in the `flatpak` release
+      # job (a full `flatpak-builder` build there is a stronger check of the
+      # manifest anyway).
+
+  desktop-file-lint:
+    name: Desktop file lint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y desktop-file-utils
+      - run: desktop-file-validate flatpak/com.mateusf.CheckDNSBlock.desktop
+
   changeset:
     name: Changeset check
     # The "Version Packages" PR (opened by changesets/action from
