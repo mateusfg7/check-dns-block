@@ -4,6 +4,7 @@
 
 [![CI](https://github.com/mateusfg7/check-dns-block/actions/workflows/ci.yml/badge.svg)](https://github.com/mateusfg7/check-dns-block/actions/workflows/ci.yml)
 [![Release](https://github.com/mateusfg7/check-dns-block/actions/workflows/release.yml/badge.svg)](https://github.com/mateusfg7/check-dns-block/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 Cross-platform desktop app that checks whether a list of domains/IPs is blocked on a given
 DNS server, by comparing its answers against a reference DNS server.
@@ -16,13 +17,14 @@ Built with [Tauri 2](https://tauri.app), Rust, React and [Kumo](https://github.c
 
 ## Features
 
-- Paste domains and/or IPs and resolve them against a configurable target DNS and reference DNS
-- Classify each result: `BLOCKED` / `NOT BLOCKED` / `NOT FOUND` / `NOT RESOLVED` / `NO RESPONSE`
-- Reverse (PTR) lookup for pasted IPs — `REVERSE OK` / `NO REVERSE`
-- "Show only blocked" filter to show only blocked entries
-- Copy results to the clipboard as TSV, or export a `;`-delimited CSV or a timestamped
-  evidence report
-- Available in English, Português (Brasil) and Español
+- 🔎 Paste domains and/or IPs and resolve them against a configurable target DNS and reference DNS
+- 🚦 Classify each result: `BLOCKED` / `NOT BLOCKED` / `NOT FOUND` / `NOT RESOLVED` / `NO RESPONSE`
+- 🔁 Reverse (PTR) lookup for pasted IPs — `REVERSE OK` / `NO REVERSE`
+- 🧹 "Show only blocked" filter to show only blocked entries
+- 📋 Copy results to the clipboard as TSV
+- 💾 Export a `;`-delimited CSV or a timestamped evidence report
+- 🌐 Available in English, Português (Brasil) and Español
+- 🌗 Light/dark theme, with a custom title bar on every platform
 
 ## Getting started
 
@@ -34,11 +36,13 @@ pnpm tauri dev      # launches the desktop app with hot reload
 See [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) for build requirements, the full
 development command reference and the project layout.
 
-## Roadmap
-
-- [ ] Command-line mode (`<app> lista.txt [dns]`)
-
 ## Contributing
 
 Contributions are welcome! See [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) to get set up,
 and [docs/RELEASING.md](./docs/RELEASING.md) for how versioning and releases work.
+
+## License
+
+[MIT](./LICENSE) © Mateus Felipe Gonçalves
+
+Made by [Mateus Felipe Gonçalves](https://mateusf.com)
