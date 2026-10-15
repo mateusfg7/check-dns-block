@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import type { CheckEvent } from "./lib/types";
+import { mockTauriWindow } from "./test/setup";
 
 const invokeMock = vi.mocked(invoke);
 
@@ -108,5 +109,17 @@ describe("App", () => {
     fireEvent.click(screen.getByRole("button", { name: "Verificar" }));
 
     expect(await screen.findByText(/não respondeu a consulta de teste/)).toBeInTheDocument();
+  });
+
+  it("renders the custom title bar's window controls and wires them to the Tauri window", async () => {
+    render(<App />);
+
+    expect(await screen.findByRole("button", { name: "Minimizar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Maximizar" })).toBeInTheDocument();
+
+    const closeButton = screen.getByRole("button", { name: "Fechar" });
+    fireEvent.click(closeButton);
+
+    expect(mockTauriWindow.close).toHaveBeenCalledOnce();
   });
 });

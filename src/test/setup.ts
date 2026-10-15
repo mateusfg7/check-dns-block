@@ -19,6 +19,20 @@ vi.mock("@tauri-apps/api/core", () => ({
   }),
 }));
 
+// `getCurrentWindow()` reads window metadata that doesn't exist in jsdom;
+// stub it so the custom title bar's window controls can be tested.
+export const mockTauriWindow = {
+  minimize: vi.fn(async () => {}),
+  toggleMaximize: vi.fn(async () => {}),
+  close: vi.fn(async () => {}),
+  isMaximized: vi.fn(async () => false),
+  onResized: vi.fn(async () => () => {}),
+};
+
+vi.mock("@tauri-apps/api/window", () => ({
+  getCurrentWindow: () => mockTauriWindow,
+}));
+
 // Pretend to be inside the Tauri webview so `src/lib/ipc.ts` doesn't
 // short-circuit to its browser fallbacks.
 Object.defineProperty(window, "__TAURI_INTERNALS__", {
