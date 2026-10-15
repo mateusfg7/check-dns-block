@@ -34,7 +34,11 @@ modules:
       # The sandbox has no network, so pnpm itself is vendored as a static
       # binary (it bundles its own JS runtime) instead of relying on a
       # package manager to install it.
-      - mkdir -p pnpm-bin && tar xzf pnpm-linux-x64.tar.gz -C pnpm-bin && chmod +x pnpm-bin/pnpm
+      # --no-same-owner: the pnpm release tarball was built on macOS CI, so
+      # its entries carry macOS ownership (uid 501/gid 20) that an
+      # unprivileged `tar` inside the sandbox can't apply (fails every entry
+      # with "Cannot change ownership ... Invalid argument").
+      - mkdir -p pnpm-bin && tar --no-same-owner -xzf pnpm-linux-x64.tar.gz -C pnpm-bin && chmod +x pnpm-bin/pnpm
       # Populates a local pnpm content-addressable store from the tarballs
       # node-sources.json vendored, then points pnpm at it - this is
       # node-sources.json's own prescribed setup (printed by
