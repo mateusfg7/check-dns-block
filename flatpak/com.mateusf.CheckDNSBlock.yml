@@ -62,7 +62,17 @@ modules:
       # registry regardless of --offline - disable it for this offline
       # build, since there's no registry to check against anyway and the
       # vendored sources already come from the committed, reviewed lockfile.
+      #
+      # Idempotent (strip any storeDir/minimumReleaseAge lines before
+      # appending fresh ones): flatpak-builder can reuse a module's build
+      # directory - still containing the `type: dir` source's copy of
+      # pnpm-workspace.yaml, already mutated by a previous run - across
+      # separate invocations, and a plain `>>` append then produced a
+      # second `storeDir:` key, which pnpm's YAML parser rejects outright
+      # ("[ERROR] duplicated mapping key").
       - |
+        grep -v '^storeDir:\|^minimumReleaseAge:' pnpm-workspace.yaml > pnpm-workspace.yaml.new
+        mv pnpm-workspace.yaml.new pnpm-workspace.yaml
         printf 'storeDir: %s/flatpak-node/pnpm-store\nminimumReleaseAge: 0\n' "$PWD" >> pnpm-workspace.yaml
       - PATH="$PWD/pnpm-bin:$PATH" pnpm install --offline --frozen-lockfile
       - PATH="$PWD/pnpm-bin:$PATH" pnpm build
