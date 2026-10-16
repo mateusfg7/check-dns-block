@@ -44,6 +44,16 @@ modules:
       # node-sources.json's own prescribed setup (printed by
       # flatpak-node-generator when run with `pnpm` as the package manager).
       - python3 flatpak-node/populate_pnpm_store.py flatpak-node/pnpm-manifest.json flatpak-node/pnpm-tarballs flatpak-node/pnpm-store
+      # populate_pnpm_store.py indexes every package by the bare
+      # `<integrity>\t<name>@<version>` pnpm uses for most packages - but
+      # not for ones with peer dependencies pnpm actually resolves (here:
+      # @cloudflare/kumo and ~20 React/Vite-ecosystem packages it pulls in).
+      # For those, pnpm's real lookup key is the full peer-qualified
+      # `snapshots:` entry from pnpm-lock.yaml, so without a matching index
+      # row under THAT id, `pnpm install --offline` reports the package
+      # "missing from the store" (confirmed via pnpm's own store/index
+      # source - see the script for the full explanation).
+      - python3 flatpak/populate_peer_snapshot_aliases.py pnpm-lock.yaml flatpak-node/pnpm-store
       # Since pnpm 11, .npmrc only reads auth/registry settings - storeDir
       # has to go in pnpm-workspace.yaml instead, or pnpm silently ignores
       # it and falls back to its (empty, in the sandbox) default store.

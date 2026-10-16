@@ -53,6 +53,12 @@ echo "==> Generating node-sources.json from pnpm-lock.yaml"
 # Tailwind's oxide engine). The native pnpm provider below worked instead;
 # its known bugs (e.g. flatpak/flatpak-builder-tools#562) are about specific
 # packages (xlsx) this project doesn't depend on.
-flatpak-node-generator --no-requests-cache -o "$out_dir/node-sources.json" pnpm "$root_dir/pnpm-lock.yaml"
+# --pnpm-store-version v11: the generator defaults to v10 for our
+# lockfileVersion (9.0), but pnpm 11's own default store (`pnpm store path`)
+# is v11 - mismatched versions mean the offline install can still silently
+# half-work (most packages resolve) while specific ones fail, so pin it to
+# what our vendored pnpm binary (see flatpak/*.yml) actually uses.
+flatpak-node-generator --no-requests-cache --pnpm-store-version v11 \
+  -o "$out_dir/node-sources.json" pnpm "$root_dir/pnpm-lock.yaml"
 
 echo "==> Done: $out_dir/{cargo,node}-sources.json"
