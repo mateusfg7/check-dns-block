@@ -146,7 +146,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: ./scripts/flatpak-sources.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: flatpak-generated-sources
           path: flatpak/generated-sources/
@@ -163,7 +163,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: flatpak-generated-sources
           path: flatpak/generated-sources/
@@ -175,7 +175,7 @@ jobs:
           manifest-path: flatpak/com.mateusf.CheckDNSBlock.yml
           cache-key: flatpak-builder-${{ github.sha }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: flatpak-bundle
           path: "*.flatpak"
@@ -188,7 +188,7 @@ jobs:
     # `gh`), so this uploads from a plain runner instead.
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: flatpak-bundle
 
