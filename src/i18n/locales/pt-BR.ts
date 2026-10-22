@@ -17,7 +17,7 @@ export const ptBR: Messages = {
       "Verifica se uma lista de domínios/IPs está bloqueada em um determinado servidor DNS, comparando suas respostas com as de um servidor DNS de referência.",
     license: "Licença MIT · © 2026 Mateus Felipe Gonçalves",
     madeBy: "Feito por Mateus Felipe Gonçalves",
-    credits: "Agradecimentos a João Gabriel",
+    inspiredBy: "Inspirado em um projeto .bat do Windows feito por João Gabriel",
     sourceCode: "Código-fonte no GitHub",
     close: "Fechar",
   },

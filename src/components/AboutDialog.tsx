@@ -69,7 +69,7 @@ export function AboutDialog({ appInfo }: AboutDialogProps) {
             rel="noopener noreferrer"
             onClick={openInBrowser(CONTRIBUTOR_URL)}
           >
-            {t.about.credits}
+            {t.about.inspiredBy}
           </Link>
           <Link
             href={REPO_URL}

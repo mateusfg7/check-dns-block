@@ -2,4 +2,4 @@
 "check-dns-block": patch
 ---
 
-Added João Gabriel ([@sloplott](https://github.com/sloplott/)) to the credits in the About dialog.
+Credited João Gabriel ([@sloplott](https://github.com/sloplott/)) in the About dialog: this project was inspired by his Windows `.bat` project.
