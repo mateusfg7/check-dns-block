@@ -114,3 +114,5 @@ work.
 [MIT](./LICENSE) © Mateus Felipe Gonçalves
 
 Made by [Mateus Felipe Gonçalves](https://mateusf.com)
+
+Inspired by a Windows `.bat` project by [João Gabriel](https://github.com/sloplott/)
