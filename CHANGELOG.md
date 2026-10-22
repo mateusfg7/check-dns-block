@@ -1,5 +1,11 @@
 # check-dns-block
 
+## 0.4.5
+
+### Patch Changes
+
+- d7990aa: Credited João Gabriel ([@sloplott](https://github.com/sloplott/)) in the About dialog and the README: this project was inspired by his Windows `.bat` project.
+
 ## 0.4.4
 
 ### Patch Changes
