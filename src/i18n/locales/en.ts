@@ -21,6 +21,7 @@ export const en = {
       "Checks whether a list of domains/IPs is blocked on a given DNS server, by comparing its answers against a reference DNS server.",
     license: "MIT License · © 2026 Mateus Felipe Gonçalves",
     madeBy: "Made by Mateus Felipe Gonçalves",
+    credits: "Thanks to João Gabriel",
     sourceCode: "Source code on GitHub",
     close: "Close",
   },

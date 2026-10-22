@@ -17,6 +17,7 @@ export const es: Messages = {
       "Verifica si una lista de dominios/IPs está bloqueada en un servidor DNS determinado, comparando sus respuestas con las de un servidor DNS de referencia.",
     license: "Licencia MIT · © 2026 Mateus Felipe Gonçalves",
     madeBy: "Hecho por Mateus Felipe Gonçalves",
+    credits: "Gracias a João Gabriel",
     sourceCode: "Código fuente en GitHub",
     close: "Cerrar",
   },

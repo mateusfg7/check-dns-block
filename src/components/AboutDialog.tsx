@@ -7,6 +7,7 @@ import type { AppInfo } from "../lib/types";
 
 const REPO_URL = "https://github.com/mateusfg7/check-dns-block";
 const AUTHOR_URL = "https://mateusf.com";
+const CONTRIBUTOR_URL = "https://github.com/sloplott/";
 
 interface AboutDialogProps {
   appInfo: AppInfo | null;
@@ -61,6 +62,14 @@ export function AboutDialog({ appInfo }: AboutDialogProps) {
             onClick={openInBrowser(AUTHOR_URL)}
           >
             {t.about.madeBy}
+          </Link>
+          <Link
+            href={CONTRIBUTOR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={openInBrowser(CONTRIBUTOR_URL)}
+          >
+            {t.about.credits}
           </Link>
           <Link
             href={REPO_URL}
