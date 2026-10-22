@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       published: ${{ steps.changesets.outputs.published }}
-      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+      publishedPackages: ${{ steps.changesets.outputs.published-packages }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -54,7 +54,7 @@ jobs:
       # this step instead tags the release and sets `published=true`.
       #
       # `publish` runs `scripts/release-tag.mjs` rather than `changeset tag`
-      # directly: changesets/action@v1 only flips `published` to `true` for a
+      # directly: changesets/action only flips `published` to `true` for a
       # root (non-monorepo) package when the publish script's stdout contains
       # a `New tag: ...` line - the format `changeset publish` prints for an
       # npm release. `changeset tag` never prints that, so `published` stayed
@@ -65,11 +65,10 @@ jobs:
         id: changesets
         uses: changesets/action@v2.1.2
         with:
-          version: pnpm run version
-          publish: pnpm run release:tag
-          createGithubReleases: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          version-script: pnpm run version
+          publish-script: pnpm run release:tag
+          create-github-releases: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   bundle:
     name: Bundle (${{ matrix.settings.name }})
