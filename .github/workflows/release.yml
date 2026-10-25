@@ -15,7 +15,7 @@ permissions:
 jobs:
   changesets:
     name: Version / tag
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     outputs:
       published: ${{ steps.changesets.outputs.published }}
       publishedPackages: ${{ steps.changesets.outputs.published-packages }}
@@ -128,7 +128,7 @@ jobs:
     name: Flatpak sources
     needs: changesets
     if: needs.changesets.outputs.published == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       # The `changesets` job already tagged this exact commit on `main`, so
       # the default checkout ref is correct.
@@ -156,7 +156,7 @@ jobs:
     name: Flatpak bundle
     needs: [changesets, bundle, flatpak-sources]
     if: needs.changesets.outputs.published == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
       options: --privileged
@@ -186,7 +186,7 @@ jobs:
     needs: [changesets, flatpak]
     # No `gh`/privileged container here (the builder image may not ship
     # `gh`), so this uploads from a plain runner instead.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/download-artifact@v8
         with:
