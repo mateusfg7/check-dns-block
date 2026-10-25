@@ -28,7 +28,7 @@ env:
 jobs:
   plan:
     name: Choose platforms
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.m.outputs.matrix }}
     steps:
