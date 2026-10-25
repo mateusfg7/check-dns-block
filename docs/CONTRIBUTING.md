@@ -56,5 +56,6 @@ The UI, exports and file names are all driven by `src/i18n/`:
 
 1. Open a PR against `main` as usual.
 2. Run `pnpm changeset` to describe your change and pick a version bump
-   (patch/minor/major) — CI (`.github/workflows/ci.yml`) fails PRs missing one.
+   (patch/minor/major) — CI (`.github/workflows/ci.yml`) fails PRs missing one. PRs that only
+   touch repo tooling (CI, docs, release scripts, lint/editor config) don't need one.
 3. Once merged, see [RELEASING.md](./RELEASING.md) for what happens next.
